@@ -43,4 +43,4 @@ agrored-nocturno-g2/
 ---
 
 ### Cómo ejecutar un microservicio
-Para poner a marchar un microservicio, se deben seguir los pasos de ejecutar `npm install` para instalar las dependencias necesarias, crear el archivo `.env` configurando las variables de entorno requeridas, y finalmente iniciar el servidor ejecutando el comando `npm run dev`.
+Para poner a marchar un microservicio dentro de su carpeta correspondiente (por ejemplo en ms-pedidos), se deben seguir los pasos de ejecutar npm install para instalar las dependencias necesarias, crear el archivo .env configurando las variables de entorno requeridas, y finalmente iniciar el servidor ejecutando el comando npm run dev.
