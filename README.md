@@ -9,7 +9,7 @@ Aplicación web distribuida basada en microservicios para la gestión agroindust
 | Juan Camilo Casierra Riascos | `casierra11` | `ms-pedidos` |
 | Brandon Montilla Hernández | `Brandon1927` | `ms-productos` |
 | Juan David Rios Gallego | `JDRios17` | `ms-clientes` |
-| Víctor Manuel Salazar Chaparro | `VictorSalazar30` | `ms-lotes` (y sensores) |
+| Víctor Manuel Salazar Chaparro | `VictorSalazar30` | `ms-lotes` |
 
 ---
 
