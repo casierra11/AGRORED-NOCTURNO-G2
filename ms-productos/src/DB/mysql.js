@@ -68,13 +68,39 @@ function update(tabla, data){
     });
 }
 
-function add(tabla, data){
-    if(data && data.id == 0){
-        return insertar(tabla, data);
-    }else{
-        return actualizar(tabla, data);
+
+
+async function add(tabla, data) {
+    if (!data) {
+        throw new Error('No se recibieron datos');
     }
+
+    const esNuevo = data.id == null || data.id == 0;
+
+    // Validar el nombre tanto al crear como al actualizar
+    if (data.nombre) {
+        const existe = await existeProducto(
+            data.nombre,
+            esNuevo ? null : data.id
+        );
+
+        if (existe) {
+            const error = new Error(
+                'Ya existe un producto con ese nombre'
+            );
+            error.status = 409;
+            throw error;
+        }
+    }
+
+    if (esNuevo) {
+        return insert(tabla, data);
+    }
+
+    return update(tabla, data);
 }
+
+
 
 function eliminar(tabla, data){
     return new Promise((resolve, reject)=>{
@@ -84,4 +110,22 @@ function eliminar(tabla, data){
     });
 }
 
-module.exports = {all, one, add, eliminar,}
+function existeProducto(nombre, idExcluir = null) {
+    return new Promise((resolve, reject) => {
+        let sql = 'SELECT id FROM productos WHERE nombre = ?';
+        const params = [nombre];
+
+        // Al actualizar, excluir el producto que estamos editando
+        if (idExcluir !== null) {
+            sql += ' AND id != ?';
+            params.push(idExcluir);
+        }
+
+        conexion.query(sql, params, (error, resultado) => {
+            if (error) return reject(error);
+            resolve(resultado.length > 0);
+        });
+    });
+}
+
+module.exports = {all, one, add, eliminar, insert, update, existeProducto}

@@ -8,14 +8,14 @@ const router = express.Router();
 router.get('/', todos);
 router.get('/:id', one);
 router.post('/', add);
-router.put('/', eliminar);
+router.delete('/', eliminar);
 
 async function todos (req, res, next){
     try {
         const items = await controller.all();
         respuesta.success(req, res, items, 200); 
     } catch (error) {
-        next(err);
+        next(error);
     }
     
 };
@@ -25,25 +25,36 @@ async function one (req, res, next){
         const items = await controller.one(req.params.id);
         respuesta.success(req, res, items, 200); 
     } catch (error) {
-        next(err);
+        next(error);
     }
     
 };
 
-async function add (req, res, next){
+
+async function add(req, res, next) {
     try {
-        const items = await controller.eliminar(req.body);
-        if(req.body.id == 0){
-            mensaje = 'Item guardado con exito';
-        }else{
-            mensaje = 'Item actualizado con exito';
-        }
-        respuesta.success(req, res, 'item eliminado satisfactoriamente', 201); 
+        const items = await controller.add(req.body);
+
+        const mensaje = req.body.id == 0 || req.body.id == null
+            ? 'Producto guardado con éxito'
+            : 'Producto actualizado con éxito';
+
+        respuesta.success(req, res, {
+            mensaje,
+            data: items
+        }, 201);
+
     } catch (error) {
-        next(err);
+        if (error.status === 409) {
+            return res.status(409).json({
+                error: error.message
+        });
     }
-    
-};
+
+    next(error);
+}
+}
+
 
 async function eliminar (req, res, next){
     try {
