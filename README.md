@@ -39,7 +39,8 @@ agrored-nocturno-g2/
 ├── ms-lotes/            # Microservicio de gestión de lotes de producción y sensores
 ├── frontend/            # Interfaz web de usuario y vistas por rol
 └── deploy/              # Archivos de configuración de despliegue y red
-
+```
 ---
+
 ### Cómo ejecutar un microservicio
 Para poner a marchar un microservicio, se deben seguir los pasos de ejecutar `npm install` para instalar las dependencias necesarias, crear el archivo `.env` configurando las variables de entorno requeridas, y finalmente iniciar el servidor ejecutando el comando `npm run dev`.
