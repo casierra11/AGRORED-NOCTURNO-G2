@@ -2,7 +2,7 @@
 
 Aplicación web distribuida basada en microservicios para la gestión agroindustrial y de distribución de AgroRed.
 
-## 👥 Integrantes del Grupo
+## Integrantes del Grupo
 
 | Integrante | Usuario de GitHub | Microservicio a cargo |
 | :--- | :--- | :--- |
@@ -13,7 +13,7 @@ Aplicación web distribuida basada en microservicios para la gestión agroindust
 
 ---
 
-## 🛠️ Tabla de Microservicios
+## Tabla de Microservicios
 
 | Carpeta | Entidad | Responsable | Puerto | Depende de (Referencias) |
 | :--- | :--- | :--- | :--- | :--- |
@@ -25,7 +25,7 @@ Aplicación web distribuida basada en microservicios para la gestión agroindust
 
 ---
 
-## 📂 Estructura del Repositorio
+## Estructura del Repositorio
 
 El repositorio se encuentra organizado de la siguiente manera:
 
