@@ -12,6 +12,15 @@ const dbconfig = {
 
 let conexion;
 
+function health() {
+    return new Promise((resolve, reject) => {
+        conexion.query('SELECT 1', (error) => {
+            if (error) return reject(error);
+            resolve(true);
+        });
+    });
+}
+
 function conMysql(){
     conexion = mysql.createConnection(dbconfig);
 
@@ -44,11 +53,16 @@ function all(tabla){
     });
 }
 
-function one(tabla, id){
-    return new Promise((resolve, reject)=>{
-        conexion.query(`SELECT * FROM ${tabla} WHERE id=${id}`, (error, result) => {
-            return error ? reject(error) : resolve(result);
-        })
+function one(tabla, nombre) {
+    return new Promise((resolve, reject) => {
+        conexion.query(
+            `SELECT * FROM ${tabla} WHERE LOWER(nombre) = LOWER(?) LIMIT 1`,
+            [nombre],
+            (error, result) => {
+                if (error) return reject(error);
+                resolve(result[0] || null);
+            }
+        );
     });
 }
 
@@ -72,12 +86,16 @@ function update(tabla, data){
 
 async function add(tabla, data) {
     if (!data) {
-        throw new Error('No se recibieron datos');
+        const error = new Error('No se recibieron datos');
+        error.status = 400;
+        throw error;
     }
+
+    // Validar categoría y unidad antes de guardar
+    validarProducto(data);
 
     const esNuevo = data.id == null || data.id == 0;
 
-    // Validar el nombre tanto al crear como al actualizar
     if (data.nombre) {
         const existe = await existeProducto(
             data.nombre,
@@ -102,11 +120,23 @@ async function add(tabla, data) {
 
 
 
-function eliminar(tabla, data){
-    return new Promise((resolve, reject)=>{
-        conexion.query(`DELETE FROM ${tabla} WHERE id = ?`, data.id, (error, result) => {
-            return error ? reject(error) : resolve(result);
-        })
+function eliminar(tabla, nombre) {
+    return new Promise((resolve, reject) => {
+        conexion.query(
+            `DELETE FROM ${tabla} WHERE LOWER(nombre) = LOWER(?) LIMIT 1`,
+            [nombre],
+            (error, result) => {
+                if (error) return reject(error);
+
+                if (result.affectedRows === 0) {
+                    const err = new Error('Producto no encontrado');
+                    err.status = 404;
+                    return reject(err);
+                }
+
+                resolve(result);
+            }
+        );
     });
 }
 
@@ -128,4 +158,33 @@ function existeProducto(nombre, idExcluir = null) {
     });
 }
 
-module.exports = {all, one, add, eliminar, insert, update, existeProducto}
+function validarProducto(data) {
+    const categoriasPermitidas = [
+        'fruta',
+        'hortaliza',
+        'procesado'
+    ];
+
+    const unidadesPermitidas = [
+        'kg',
+        'caja'
+    ];
+
+    if (!categoriasPermitidas.includes(data.categoria)) {
+        const error = new Error(
+            'Categoría inválida. Valores permitidos: fruta, hortaliza, procesado'
+        );
+        error.status = 400;
+        throw error;
+    }
+
+    if (!unidadesPermitidas.includes(data.unidad)) {
+        const error = new Error(
+            'Unidad inválida. Valores permitidos: kg, caja'
+        );
+        error.status = 400;
+        throw error;
+    }
+}
+
+module.exports = {health, all, one, add, eliminar, insert, update, existeProducto, validarProducto}

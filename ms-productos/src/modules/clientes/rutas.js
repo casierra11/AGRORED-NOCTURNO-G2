@@ -5,10 +5,11 @@ const controller = require('./controller');
 
 const router = express.Router();
 
+router.get('/health', health);
 router.get('/', todos);
-router.get('/:id', one);
+router.get('/:nombre', one);
 router.post('/', add);
-router.delete('/', eliminar);
+router.delete('/:nombre', eliminar);
 
 async function todos (req, res, next){
     try {
@@ -20,15 +21,21 @@ async function todos (req, res, next){
     
 };
 
-async function one (req, res, next){
+async function one(req, res, next) {
     try {
-        const items = await controller.one(req.params.id);
-        respuesta.success(req, res, items, 200); 
+        const items = await controller.one(req.params.nombre);
+
+        if (!items) {
+            return res.status(404).json({
+                error: 'Producto no encontrado'
+            });
+        }
+
+        respuesta.success(req, res, items, 200);
     } catch (error) {
         next(error);
     }
-    
-};
+}
 
 
 async function add(req, res, next) {
@@ -45,25 +52,56 @@ async function add(req, res, next) {
         }, 201);
 
     } catch (error) {
-        if (error.status === 409) {
-            return res.status(409).json({
-                error: error.message
-        });
+            if (error.status === 400 || error.status === 409) {
+                return res.status(error.status).json({
+                    error: error.message
+            });
+        }
+
+        next(error);
     }
 
     next(error);
 }
+
+
+async function eliminar(req, res, next) {
+    try {
+        await controller.eliminar(req.params.nombre);
+
+        respuesta.success(
+            req,
+            res,
+            'Producto eliminado correctamente',
+            200
+        );
+    } catch (error) {
+        if (error.status === 404) {
+            return res.status(404).json({
+                error: error.message
+            });
+        }
+
+        next(error);
+    }
 }
 
 
-async function eliminar (req, res, next){
+async function health(req, res) {
     try {
-        const items = await controller.eliminar(req.body);
-        respuesta.success(req, res, 'item eliminado satisfactoriamente', 200); 
+        await controller.health();
+
+        res.status(200).json({
+            status: 'ok',
+            message: 'API y base de datos funcionando'
+        });
     } catch (error) {
-        next(err);
+        res.status(503).json({
+            status: 'error',
+            message: 'La base de datos no está disponible'
+        });
     }
-    
-};
+}
+
 
 module.exports = router;

@@ -6,16 +6,20 @@ function all(){
     return db.all(TABLA);
 }
 
-function one(id){
-    return db.one(TABLA, id);
+function one(nombre){
+    return db.one(TABLA, nombre);
 }
 
 function add(body){
     return db.add(TABLA, body);
 }
 
-function eliminar(body){
-    return db.eliminar(TABLA, body);
+function eliminar(nombre) {
+    return db.eliminar(TABLA, nombre);
 }
 
-module.exports= {all, one, add, eliminar};
+function health() {
+    return db.health();
+}
+
+module.exports= {all, one, add, eliminar, health};

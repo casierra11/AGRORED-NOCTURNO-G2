@@ -16,7 +16,7 @@ app.use(express.urlencoded({ extended: true}));
 app.set('port', config.app.port);
 
 //Rutas
-app.use('/api/productos', productos)
+app.use('/productos', productos)
 app.use(error);
 
 module.exports = app;
