@@ -29,7 +29,7 @@ async function crear(datos) {
   // 2. Regla de negocio: No pueden existir dos lotes con el mismo código
   const existe = await repo.findByCodigoLote(datos.codigo_lote);
   if (existe) {
-    throw new HttpError(400, `Ya existe un lote con el código ${datos.codigo_lote}`);
+    throw new HttpError(409, `Ya existe un lote con el código ${datos.codigo_lote}`);
   }
 
   // 3. Limpiar los datos y mandarlos a guardar
