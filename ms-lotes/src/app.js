@@ -14,7 +14,7 @@ app.use(express.json());
 
 // Endpoint de prueba (Health check) requerido para la Semana 1
 app.get('/health', (req, res) => {
-  res.status(200).send('OK');
+    res.status(200).json({ servicio: "ms-lotes", estado: "ok" });
 });
 
 // Le decimos a la aplicación que dirija todas las peticiones /lotes a nuestro enrutador
