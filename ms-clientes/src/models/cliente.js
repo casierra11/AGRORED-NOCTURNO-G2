@@ -5,7 +5,7 @@
 // =====================================================================
 
 // Los tipos válidos para los clientes de AgroRed
-function tiposValidos() {
+function tiposValidos() { 
   return ['distribuidor', 'comercio'];
 }
 
