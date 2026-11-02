@@ -31,4 +31,14 @@ async function create(cliente) {
   return nuevo;
 }
 
-module.exports = { findAll, findById, findByNit, create };
+//nueva Funcion para actualizar un cliente existente
+async function update(id, cliente) {
+  const posicion = clientes.findIndex((c) => c.id === id);
+  if (posicion === -1) return null;// Cliente no encontrado
+  clientes[posicion] = { id, ...cliente };
+  return clientes[posicion];
+}
+
+
+
+module.exports = { findAll, findById, findByNit, create ,update};
