@@ -1,0 +1,432 @@
+{
+	"info": {
+		"_postman_id": "a8f3c9e1-2026-4b2e-9871-ms-productos",
+		"name": "ms-productos",
+		"description": "Colección completa de pruebas automatizadas para ms-productos (Taller 2: REST, MySQL, JWT y Relaciones).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3002",
+			"type": "string"
+		},
+		{
+			"key": "tokenAdmin",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "tokenSinPermiso",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "0. Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/productos/health",
+					"host": ["{{baseUrl}}"],
+					"path": ["productos", "health"]
+				}
+			}
+		},
+		{
+			"name": "1. Listar todos (200)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenAdmin}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/productos",
+					"host": ["{{baseUrl}}"],
+					"path": ["productos"]
+				}
+			}
+		},
+		{
+			"name": "2. Filtrar por atributo (200)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenAdmin}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/productos?categoria=fruta",
+					"host": ["{{baseUrl}}"],
+					"path": ["productos"],
+					"query": [
+						{
+							"key": "categoria",
+							"value": "fruta"
+						}
+					]
+				}
+			}
+		},
+		{
+			"name": "3. Consultar por lotes ?ids= (200)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenAdmin}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/productos?ids=1,2,3",
+					"host": ["{{baseUrl}}"],
+					"path": ["productos"],
+					"query": [
+						{
+							"key": "ids",
+							"value": "1,2,3"
+						}
+					]
+				}
+			}
+		},
+		{
+			"name": "4. Obtener registro existente (200)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenAdmin}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/productos/1",
+					"host": ["{{baseUrl}}"],
+					"path": ["productos", "1"]
+				}
+			}
+		},
+		{
+			"name": "5. Obtener ID que no existe (404)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenAdmin}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/productos/9999",
+					"host": ["{{baseUrl}}"],
+					"path": ["productos", "9999"]
+				}
+			}
+		},
+		{
+			"name": "6. Obtener ID no numérico (400)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenAdmin}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/productos/abc",
+					"host": ["{{baseUrl}}"],
+					"path": ["productos", "abc"]
+				}
+			}
+		},
+		{
+			"name": "7. Crear con datos válidos (201)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenAdmin}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nombre\": \"Piña Oro Miel\",\n  \"categoria\": \"fruta\",\n  \"unidad\": \"kg\",\n  \"precio\": 3500\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/productos",
+					"host": ["{{baseUrl}}"],
+					"path": ["productos"]
+				}
+			}
+		},
+		{
+			"name": "8. Crear sin atributo obligatorio (400)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenAdmin}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"categoria\": \"fruta\",\n  \"unidad\": \"kg\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/productos",
+					"host": ["{{baseUrl}}"],
+					"path": ["productos"]
+				}
+			}
+		},
+		{
+			"name": "9. Crear violando regla de unicidad (409)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenAdmin}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nombre\": \"Aguacate Hass\",\n  \"categoria\": \"fruta\",\n  \"unidad\": \"kg\",\n  \"precio\": 9000\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/productos",
+					"host": ["{{baseUrl}}"],
+					"path": ["productos"]
+				}
+			}
+		},
+		{
+			"name": "10. Actualizar registro existente (200)",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenAdmin}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nombre\": \"Aguacate Hass Premium\",\n  \"categoria\": \"fruta\",\n  \"unidad\": \"kg\",\n  \"precio\": 9500\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/productos/1",
+					"host": ["{{baseUrl}}"],
+					"path": ["productos", "1"]
+				}
+			}
+		},
+		{
+			"name": "11. Actualizar ID inexistente (404)",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenAdmin}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nombre\": \"Fresa Dulce\",\n  \"categoria\": \"fruta\",\n  \"unidad\": \"kg\",\n  \"precio\": 12000\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/productos/9999",
+					"host": ["{{baseUrl}}"],
+					"path": ["productos", "9999"]
+				}
+			}
+		},
+		{
+			"name": "12. Eliminar registro existente (204)",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenAdmin}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/productos/2",
+					"host": ["{{baseUrl}}"],
+					"path": ["productos", "2"]
+				}
+			}
+		},
+		{
+			"name": "13. Eliminar mismo registro otra vez (404)",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenAdmin}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/productos/2",
+					"host": ["{{baseUrl}}"],
+					"path": ["productos", "2"]
+				}
+			}
+		},
+		{
+			"name": "14. Petición sin token (401)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/productos",
+					"host": ["{{baseUrl}}"],
+					"path": ["productos"]
+				}
+			}
+		},
+		{
+			"name": "15. Token modificado o falso (401)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer token_inventado_o_invalido",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/productos",
+					"host": ["{{baseUrl}}"],
+					"path": ["productos"]
+				}
+			}
+		},
+		{
+			"name": "16. GET con token de solo consulta (200)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenSinPermiso}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/productos",
+					"host": ["{{baseUrl}}"],
+					"path": ["productos"]
+				}
+			}
+		},
+		{
+			"name": "17. POST con token sin permiso de crear (403)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenSinPermiso}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nombre\": \"Uva Isabela\",\n  \"categoria\": \"fruta\",\n  \"unidad\": \"kg\",\n  \"precio\": 6000\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/productos",
+					"host": ["{{baseUrl}}"],
+					"path": ["productos"]
+				}
+			}
+		},
+		{
+			"name": "18. POST con token con permiso (201)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenAdmin}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nombre\": \"Uva Isabela\",\n  \"categoria\": \"fruta\",\n  \"unidad\": \"kg\",\n  \"precio\": 6000\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/productos",
+					"host": ["{{baseUrl}}"],
+					"path": ["productos"]
+				}
+			}
+		}
+	]
+}
