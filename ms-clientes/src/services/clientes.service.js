@@ -36,12 +36,12 @@ async function actualizar(id, datos) {
   const errores = validarCliente(datos);
   if (errores.length > 0) throw new HttpError(400, 'Datos inválidos', errores);
 
-  // Regla de negocio: no puede haber dos clientes con el mismo NIT
+  // Regla de negocio: el cliente puede conservar su NIT, pero no puede cambiarlo 
+  // a uno que ya exista en otro cliente.
   const otros= await repo.findbyNit(cliente.nit);
   if (otros && otros.id !== id) {
     throw new HttpError(409, `Ya existe otro cliente con el NIT ${cliente.nit}`);
   }
-
   // AQUÍ ESTABA EL ERROR: Cambia 'cliente' por 'datos'
   const actualizado = await repo.update(id, datos);
   
