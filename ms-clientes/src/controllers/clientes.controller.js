@@ -13,8 +13,17 @@ function leerId(req) {
 }
 
 // GET /clientes
+//Get/clientes/Getclientes?tipo=distribuidor,Get/clientees?ids=1,3
 async function listar(req, res) {
-  const clientes = await service.listar();
+const filtros={tipo:req.query.tipo};
+if(req.query.ids){ //ids 1,3
+  filtros.ids=String(req.query.ids).split(',').map(Number);
+if(filtros.ids.some((id => !Number.isInteger(id) || id <= 0))) {
+  throw new HttpError(400, 'Los ids deben ser enteros positivos');
+
+}
+}
+  const clientes = await service.listar(filtros);
   res.status(200).json(clientes);
 }
 
@@ -36,5 +45,11 @@ async function actualizar(req, res) {
   const actualizado = await service.actualizar(id, req.body);
   res.status(200).json(actualizado);
 }
+//eliminar cliente
+async function eliminar(req, res) {
+  const id = leerId(req);
+  await service.eliminar(id);
+  res.status(204).send(); // sin cuerpo, solo el código de estado 204 No Content
+}
 
-module.exports = { listar, obtener, crear, actualizar };
+module.exports = { listar, obtener, crear, actualizar, eliminar };
