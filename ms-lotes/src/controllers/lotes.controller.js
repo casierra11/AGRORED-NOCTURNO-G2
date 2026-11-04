@@ -28,9 +28,14 @@ async function obtenerPorId(req, res, next) {
 async function crear(req, res, next) {
   try {
     const nuevoLote = await service.crear(req.body);
+    // Si todo sale bien (éxito), devuelve 201 y los datos
     res.status(201).json(nuevoLote);
   } catch (error) {
-    next(error);
+    // Si la validación falla, atrapa el error aquí y devuelve el JSON estructurado
+    res.status(error.status || 500).json({
+      error: error.message,
+      detalles: error.detalles
+    });
   }
 }
 
