@@ -117,3 +117,5 @@ Todos los errores responden con el mismo formato, para que quien consume el serv
 }
 
 ```
+## Pruebas
+Colección de Postman en `docs/ms-pedidos.postman_collection.json` (13 casos).
