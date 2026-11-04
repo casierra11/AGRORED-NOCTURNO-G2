@@ -1,4 +1,4 @@
-const pool = require('../config/db');
+const pool = require('../db');
 
 // =====================================================================
 // CAPA DE ACCESO A DATOS (repositorio con MySQL)
