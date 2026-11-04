@@ -6,48 +6,77 @@
 // Todas las funciones son async (devuelven promesas) para que el cambio
 // a una base de datos real no obligue a modificar la capa de servicio.
 // =====================================================================
-const clientes = [
-  { id: 1, nombre: 'Distribuidora del Valle', nit: '900123456-1', ciudad: 'Cali', telefono: '3101234567', tipo: 'distribuidor' },
-  { id: 2, nombre: 'Supermercado El Campo', nit: '800987654-2', ciudad: 'Bogotá', telefono: '3209876543', tipo: 'comercio' },
-  { id: 3, nombre: 'AgroComercial del Sur', nit: '901112233-3', ciudad: 'Medellín', telefono: '3155554433', tipo: 'distribuidor' },
-];
-let siguienteId = 4;
+// src/repositories/clientes.repository.js — versión MySQL para ms-clientes
+const pool = require('../db');
 
-  async function findAll(filtros = {}) {
-    return clientes.filter((c) =>(
-    (!filtros.tipo || c.tipo === filtros.tipo) &&
-    (!filtros.ids || filtros.ids.includes(c.id)))); 
-  }
+async function findAll(filtros = {}) {
+    let sql = 'SELECT * FROM clientes';
+    const condiciones = [];
+    const valores = [];
 
-  async function findById(id) {
-    return clientes.find((c) => c.id === id) || null;
-  }
+    if (filtros.ciudad) {
+        condiciones.push('ciudad = ?');
+        valores.push(filtros.ciudad);
+    }
+    if (filtros.tipo) {
+        condiciones.push('tipo = ?');
+        valores.push(filtros.tipo);
+    }
+    if (filtros.ids) { // ?ids=1,2,3 → WHERE id IN (1, 2, 3)
+        condiciones.push('id IN (?)');
+        valores.push(filtros.ids);
+    }
 
-async function findByNit(nit) {
-  return clientes.find((c) => c.nit === nit) || null;
+    if (condiciones.length > 0) sql += ' WHERE ' + condiciones.join(' AND ');
+    
+    const [filas] = await pool.query(sql + ' ORDER BY id', valores);
+    return filas;
+}
+
+async function findById(id) {
+    const [filas] = await pool.query('SELECT * FROM clientes WHERE id = ?', [id]);
+    return filas.length > 0 ? filas[0] : null;
 }
 
 async function create(cliente) {
-  const nuevo = { id: siguienteId++, ...cliente };
-  clientes.push(nuevo);
-  return nuevo;
+    const [resultado] = await pool.query(
+        'INSERT INTO clientes (nombre, nit, ciudad, telefono, tipo) VALUES (?, ?, ?, ?, ?)',
+        [cliente.nombre, cliente.nit, cliente.ciudad, cliente.telefono, cliente.tipo]
+    );
+    return findById(resultado.insertId);
 }
 
-//nueva Funcion para actualizar un cliente existente
+// NUEVA: Función para buscar por NIT (necesaria para el registro)
+async function findByNit(nit) {
+    const [filas] = await pool.query('SELECT * FROM clientes WHERE nit = ?', [nit]);
+    return filas.length > 0 ? filas[0] : null;
+}
+
+
+// actualiza un cliente existente
 async function update(id, cliente) {
-  const posicion = clientes.findIndex((c) => c.id === id);
-  if (posicion === -1) return null;// Cliente no encontrado
-  clientes[posicion] = { id, ...cliente };
-  return clientes[posicion];
+    const [resultado] = await pool.query(
+        'UPDATE clientes SET nombre = ?, nit = ?, ciudad = ?, telefono = ?, tipo = ? WHERE id = ?',
+        [cliente.nombre, cliente.nit, cliente.ciudad, cliente.telefono, cliente.tipo, id]
+    );
+    if (resultado.affectedRows === 0) return null;
+    return findById(id);
 }
-
-//remover un cliente existente
+//nueva funcion para eliminar un cliente existente
 async function remove(id) {
-  const posicion = clientes.findIndex((c) => c.id === id);
-  if (posicion === -1) return null; // Cliente no encontrado
-  clientes.splice(posicion, 1);
-  return true; // Cliente eliminado exitosamente
+    const clienteExistente = await findById(id);
+    if (!clienteExistente) return null;
+
+    const [resultado] = await pool.query('DELETE FROM clientes WHERE id = ?', [id]);
+    return resultado.affectedRows > 0 ? clienteExistente : null;
 }
 
-
-module.exports = { findAll, findById, findByNit, create ,update, remove};
+module.exports = {
+    findAll,
+    findById,
+    create,
+    findByNit,
+    
+    update,
+    remove
+};
