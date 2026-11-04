@@ -16,7 +16,7 @@
 **copy .env.example .env      \# en Windows (en Linux/Mac: cp .env.example .env)**  
 **npm run dev                 \# inicia y se reinicia solo al guardar cambios**
 
-**Prueben en el navegador o Postman: http\://localhost:3003/health y http\://localhost:3003/clientes** 
+**Prueben en el navegador o Postman: http\://localhost:3002/health y http\://localhost:3002/clientes** 
 
 **Capas :**
 

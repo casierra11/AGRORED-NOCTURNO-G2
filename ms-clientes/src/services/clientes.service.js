@@ -38,9 +38,9 @@ async function actualizar(id, datos) {
 
   // Regla de negocio: el cliente puede conservar su NIT, pero no puede cambiarlo 
   // a uno que ya exista en otro cliente.
-  const otros= await repo.findbyNit(cliente.nit);
+  const otros= await repo.findByNit(datos.nit);
   if (otros && otros.id !== id) {
-    throw new HttpError(409, `Ya existe otro cliente con el NIT ${cliente.nit}`);
+    throw new HttpError(409, `Ya existe otro cliente con el NIT ${datos.nit}`);
   }
   // AQUÍ ESTABA EL ERROR: Cambia 'cliente' por 'datos'
   const actualizado = await repo.update(id, datos);
