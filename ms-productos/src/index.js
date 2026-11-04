@@ -1,5 +1,8 @@
-const app = require('./app.js');
+require('dotenv').config();
+const app = require('./app');
 
-app.listen(app.get('port'), ()=>{
-    console.log("Servidor escuchando en el puerto ", app.get("port"));
-})
+const PORT = process.env.PORT || 3002;
+
+app.listen(PORT, () => {
+  console.log(`ms-productos escuchando en http://127.0.0.1:${PORT}`);
+});

@@ -1,22 +1,24 @@
 const express = require('express');
 const morgan = require('morgan');
-const config = require('./config');
-
-const productos = require('./modules/clientes/rutas.js');
-const error = require('./red/errors.js');
+const productosRoutes = require('./routes/productos.routes');
 
 const app = express();
 
-//Middleware
 app.use(morgan('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true}));
 
-//Configuración
-app.set('port', config.app.port);
+app.use('/productos', productosRoutes);
 
-//Rutas
-app.use('/productos', productos)
-app.use(error);
+// Middleware global de manejo de errores estandarizado (400, 404, 409, 500)
+app.use((err, req, res, next) => {
+  const status = err.status || 500;
+  const response = { error: err.message || 'Error interno del servidor' };
+
+  if (err.detalles && err.detalles.length > 0) {
+    response.detalles = err.detalles;
+  }
+
+  res.status(status).json(response);
+});
 
 module.exports = app;

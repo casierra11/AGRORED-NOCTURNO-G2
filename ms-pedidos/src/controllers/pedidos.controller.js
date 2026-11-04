@@ -12,9 +12,18 @@ function leerId(req) {
   return id;
 }
 
-// GET /pedidos
+// GET /pedidos (con soporte para filtros y consulta por lotes ?ids=)
 async function listar(req, res) {
-  const pedidos = await service.listar();
+  const filtros = { centro_distribucion: req.query.centro_distribucion };
+
+  if (req.query.ids) {
+    filtros.ids = String(req.query.ids).split(',').map(Number);
+    if (filtros.ids.some((id) => !Number.isInteger(id) || id <= 0)) {
+      throw new HttpError(400, 'ids debe ser una lista de enteros separados por comas');
+    }
+  }
+
+  const pedidos = await service.listar(filtros);
   res.status(200).json(pedidos);
 }
 
@@ -30,4 +39,17 @@ async function crear(req, res) {
   res.status(201).location(`${req.baseUrl}/${nuevo.id}`).json(nuevo);
 }
 
-module.exports = { listar, obtener, crear };
+// PUT /pedidos/:id
+async function actualizar(req, res) {
+  const id = leerId(req);
+  const actualizado = await service.actualizar(id, req.body);
+  res.status(200).json(actualizado);
+}
+
+// DELETE /pedidos/:id
+async function eliminar(req, res) {
+  await service.eliminar(leerId(req));
+  res.status(204).end(); // 204 No Content: éxito, sin cuerpo
+}
+
+module.exports = { listar, obtener, crear, actualizar, eliminar };
