@@ -9,15 +9,20 @@ const lotes = [
 ];
 let siguienteId = 4;
 
-async function findAll() {
-  return lotes;
+async function findAll(filtros = {}) {
+  let resultado = lotes;
+  
+  // Si viene un filtro por estado de cultivo, filtramos el arreglo
+  if (filtros.estado_cultivo) {
+    resultado = resultado.filter((l) => l.estado_cultivo === filtros.estado_cultivo);
+  }
+  return resultado;
 }
 
 async function findById(id) {
   return lotes.find((l) => l.id === id) || null;
 }
 
-// Reemplazamos "findByEmail" por "findByCodigoLote" para evitar códigos duplicados
 async function findByCodigoLote(codigo) {
   return lotes.find((l) => l.codigo_lote === codigo) || null;
 }
@@ -28,5 +33,20 @@ async function create(lote) {
   return nuevo;
 }
 
-// Exportar funciones (incluyendo Update y Delete, que añadiremos luego)
-module.exports = { findAll, findById, findByCodigoLote, create };
+async function update(id, datos) {
+  const index = lotes.findIndex((l) => l.id === id);
+  if (index === -1) return null; // No existe
+  
+  lotes[index] = { ...lotes[index], ...datos, id };
+  return lotes[index];
+}
+
+async function remove(id) {
+  const index = lotes.findIndex((l) => l.id === id);
+  if (index === -1) return false; // No existe
+  
+  lotes.splice(index, 1);
+  return true;
+}
+
+module.exports = { findAll, findById, findByCodigoLote, create, update, remove };
