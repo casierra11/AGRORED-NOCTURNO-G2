@@ -10,5 +10,7 @@ const controller = require('../controllers/lotes.controller');
 router.get('/', controller.obtenerTodos);
 router.get('/:id', controller.obtenerPorId);
 router.post('/', controller.crear);
+router.put('/:id', controller.actualizar);
+router.delete('/:id', controller.eliminar);
 
 module.exports = router;
