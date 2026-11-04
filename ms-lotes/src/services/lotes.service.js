@@ -21,9 +21,12 @@ async function obtenerPorId(id) {
 
 async function crear(datos) {
   // 1. Validar que vengan todos los campos obligatorios
-  const errores = validarLote(datos);
+  const errores = [];
+  if (!datos.producto_id) errores.push("producto_id es obligatorio");
+  if (!datos.cantidad) errores.push("cantidad es obligatoria");
+
   if (errores.length > 0) {
-    throw new HttpError(400, errores.join(', '));
+    throw new HttpError(400, "Datos inválidos", errores);
   }
 
   // 2. Regla de negocio: No pueden existir dos lotes con el mismo código
