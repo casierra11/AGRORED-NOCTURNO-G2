@@ -1,65 +1,86 @@
+const pool = require('../config/db');
+
 // =====================================================================
-// CAPA DE ACCESO A DATOS (repositorio)
+// CAPA DE ACCESO A DATOS (repositorio con MySQL)
 // Única capa que sabe DÓNDE se guardan los datos.
-// Versión del Taller 1 y adaptación inicial del Taller 2 (en memoria).
 // =====================================================================
-const pedidos = [
-  { id: 1, cliente_id: 1, producto_id: 2, cantidad: 50, centro_distribucion: 'Cali', estado: 'recibido', fecha: '2026-10-25' },
-  { id: 2, cliente_id: 2, producto_id: 1, cantidad: 120, centro_distribucion: 'Bogotá', estado: 'despachado', fecha: '2026-10-26' },
-  { id: 3, cliente_id: 3, producto_id: 3, cantidad: 80, centro_distribucion: 'Cali', estado: 'entregado', fecha: '2026-10-24' },
-];
-let siguienteId = 4;
 
-// 1. Listar con soporte de filtros (por centro de distribución y por lotes con ?ids=)
+// 1. Listar con soporte de filtros (por centro de distribución y por ids con ?ids=)
 async function findAll(filtros = {}) {
-  let resultado = pedidos;
+    let query = 'SELECT * FROM orders WHERE 1=1';
+    let params = [];
 
-  if (filtros.centro_distribucion) {
-    resultado = resultado.filter((p) => p.centro_distribucion === filtros.centro_distribucion);
-  }
+    if (filtros.centro_distribucion) {
+        query += ' AND centro_distribucion = ?';
+        params.push(filtros.centro_distribucion);
+    }
 
-  if (filtros.ids && filtros.ids.length > 0) {
-    resultado = resultado.filter((p) => filtros.ids.includes(p.id));
-  }
+    if (filtros.ids && filtros.ids.length > 0) {
+        query += ' AND id IN (?)';
+        params.push(filtros.ids);
+    }
 
-  return resultado;
+    const [rows] = await pool.query(query, params);
+    return rows;
 }
 
+// 2. Buscar por ID
 async function findById(id) {
-  return pedidos.find((p) => p.id === Number(id)) || null;
+    const [rows] = await pool.query('SELECT * FROM orders WHERE id = ?', [id]);
+    return rows[0] || null;
 }
 
+// 3. Crear un nuevo pedido
 async function create(pedido) {
-  const nuevo = { id: siguienteId++, ...pedido };
-  pedidos.push(nuevo);
-  return nuevo;
+    const { cliente_id, producto_id, cantidad, centro_distribucion, estado, fecha } = pedido;
+    const [result] = await pool.query(
+        'INSERT INTO orders (cliente_id, producto_id, cantidad, centro_distribucion, estado, fecha) VALUES (?, ?, ?, ?, ?, ?)',
+        [cliente_id, producto_id, cantidad, centro_distribucion, estado, fecha]
+    );
+    
+    return {
+        id: result.insertId,
+        ...pedido
+    };
 }
 
-// 2. Función para actualizar (PUT) en memoria
+// 4. Actualizar un pedido (PUT)
 async function update(id, datosNuevos) {
-  const index = pedidos.findIndex((p) => p.id === Number(id));
-  if (index === -1) {
-    return null; // No existe el pedido
-  }
-  // Mantiene el id original y actualiza el resto de los campos
-  pedidos[index] = { ...pedidos[index], ...datosNuevos, id: Number(id) };
-  return pedidos[index];
+    const pedidoExistente = await findById(id);
+    if (!pedidoExistente) {
+        return null; // No existe el pedido
+    }
+
+    // Combinamos los datos anteriores con los nuevos para asegurar que no se pierdan campos
+    const cliente_id = datosNuevos.cliente_id !== undefined ? datosNuevos.cliente_id : pedidoExistente.cliente_id;
+    const producto_id = datosNuevos.producto_id !== undefined ? datosNuevos.producto_id : pedidoExistente.producto_id;
+    const cantidad = datosNuevos.cantidad !== undefined ? datosNuevos.cantidad : pedidoExistente.cantidad;
+    const centro_distribucion = datosNuevos.centro_distribucion !== undefined ? datosNuevos.centro_distribucion : pedidoExistente.centro_distribucion;
+    const estado = datosNuevos.estado !== undefined ? datosNuevos.estado : pedidoExistente.estado;
+    const fecha = datosNuevos.fecha !== undefined ? datosNuevos.fecha : pedidoExistente.fecha;
+
+    await pool.query(
+        'UPDATE orders SET cliente_id = ?, producto_id = ?, cantidad = ?, centro_distribucion = ?, estado = ?, fecha = ? WHERE id = ?',
+        [cliente_id, producto_id, cantidad, centro_distribucion, estado, fecha, Number(id)]
+    );
+
+    return await findById(id);
 }
 
-// 3. Función para eliminar (DELETE) en memoria
+// 5. Eliminar un pedido (DELETE)
 async function remove(id) {
-  const index = pedidos.findIndex((p) => p.id === Number(id));
-  if (index === -1) {
-    return false; // No existe el pedido
-  }
-  pedidos.splice(index, 1);
-  return true;
+    const pedido = await findById(id);
+    if (!pedido) {
+        return false; // No existe el pedido
+    }
+    await pool.query('DELETE FROM orders WHERE id = ?', [Number(id)]);
+    return true;
 }
 
 module.exports = { 
-  findAll, 
-  findById, 
-  create, 
-  update, 
-  remove 
+    findAll, 
+    findById, 
+    create, 
+    update, 
+    remove 
 };
