@@ -7,6 +7,9 @@ const repo = require('../repositories/lotes.repository');
 const { validarLote, construirLote } = require('../models/lote');
 const HttpError = require('../utils/http-error');
 
+// 1. IMPORTAMOS EL CLIENTE HTTP
+const productosClient = require('../clients/productos.client');
+
 async function obtenerTodos(filtros) {
   return await repo.findAll(filtros);
 }
@@ -19,7 +22,9 @@ async function obtenerPorId(id) {
   return lote;
 }
 
-async function crear(datos) {
+// 2. Unificamos la función crear recibiendo el parámetro 'token'
+async function crear(datos, token) {
+  // Validaciones básicas locales
   const errores = [];
   if (!datos.producto_id) errores.push("producto_id es obligatorio");
   if (!datos.cantidad || datos.cantidad <= 0) errores.push("cantidad es obligatoria y debe ser mayor a 0");
@@ -28,11 +33,19 @@ async function crear(datos) {
     throw new HttpError(400, "Datos inválidos", errores);
   }
 
+  // Validar código duplicado localmente
   const existe = await repo.findByCodigoLote(datos.codigo_lote);
   if (existe) {
     throw new HttpError(409, `Ya existe un lote con el código ${datos.codigo_lote}`);
   }
 
+  // 3. COMUNICACIÓN SÍNCRONA: Validar que el producto exista en ms-productos
+  const productoExiste = await productosClient.verificarProductoExiste(datos.producto_id, token);
+  if (!productoExiste) {
+    throw new HttpError(400, "Integridad referencial fallida", [`El producto con ID ${datos.producto_id} no existe en el sistema AgroRed.`]);
+  }
+
+  // 4. Si todo está bien, construimos el objeto limpio y guardamos
   const loteLimpio = construirLote(datos);
   return await repo.create(loteLimpio);
 }
