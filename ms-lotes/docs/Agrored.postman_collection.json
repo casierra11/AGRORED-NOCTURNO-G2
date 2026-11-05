@@ -45,12 +45,12 @@
       "response": []
     },
     {
-      "name": "Lote (Exito)",
+      "name": "Buscar Lote (Exito)",
       "request": {
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:3005/lotes/1",
+          "raw": "http://localhost:3005/lotes/4",
           "protocol": "http",
           "host": [
             "localhost"
@@ -58,7 +58,7 @@
           "port": "3005",
           "path": [
             "lotes",
-            "1"
+            "4"
           ]
         }
       },
@@ -91,7 +91,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\"codigo_lote\": \"LOT-1005\", \r\n\"producto_id\": 15, \r\n\"fecha_produccion\": \"2026-10-30\", \r\n\"cantidad\": 450, \r\n\"resultado_calidad\": \"aprobado\"}",
+          "raw": "{\"codigo_lote\": \"LOT-1001\", \r\n\"producto_id\": 18, \r\n\"fecha_produccion\": \"2026-11-5\", \r\n\"cantidad\": 450, \r\n\"resultado_calidad\": \"aprobado\"}",
           "options": {
             "raw": {
               "language": "json"
@@ -213,7 +213,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n  \"codigo_lote\": \"LOT-9999\",\r\n  \"producto_id\": 5,\r\n  \"fecha_produccion\": \"2026-11-04\",\r\n  \"cantidad\": 100,\r\n  \"resultado_calidad\": \"aprobado\"\r\n}",
+          "raw": "{\r\n  \"codigo_lote\": \"LOT-1001\",\r\n  \"producto_id\": 5,\r\n  \"fecha_produccion\": \"2026-11-04\",\r\n  \"cantidad\": 100,\r\n  \"resultado_calidad\": \"aprobado\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -235,7 +235,7 @@
       "response": []
     },
     {
-      "name": "Ingreso con Token Copy",
+      "name": "PUT CAMBIAR LOTE",
       "request": {
         "auth": {
           "type": "bearer",
@@ -247,11 +247,11 @@
             }
           ]
         },
-        "method": "POST",
+        "method": "PUT",
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n  \"codigo_lote\": \"LOT-7777\",\r\n  \"producto_id\": 5,\r\n  \"fecha_produccion\": \"2026-11-04\",\r\n  \"cantidad\": 100,\r\n  \"resultado_calidad\": \"aprobado\"\r\n}",
+          "raw": "{\r\n  \"codigo_lote\": \"LOT-9999\",\r\n  \"producto_id\": 5,\r\n  \"fecha_produccion\": \"2026-11-04\",\r\n  \"cantidad\": 250,\r\n  \"resultado_calidad\": \"aprobado\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -259,7 +259,57 @@
           }
         },
         "url": {
-          "raw": "http://localhost:3005/lotes",
+          "raw": "http://localhost:3005/lotes/4",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3005",
+          "path": [
+            "lotes",
+            "4"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Eliminar Lote",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_05nr}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3005/lotes/5",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3005",
+          "path": [
+            "lotes",
+            "5"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Filtro resultado_calidad",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3005/lotes?resultado_calidad=aprobado",
           "protocol": "http",
           "host": [
             "localhost"
@@ -267,6 +317,12 @@
           "port": "3005",
           "path": [
             "lotes"
+          ],
+          "query": [
+            {
+              "key": "resultado_calidad",
+              "value": "aprobado"
+            }
           ]
         }
       },

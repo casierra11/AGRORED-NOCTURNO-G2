@@ -46,11 +46,15 @@ async function crear(req, res, next) {
 
 async function actualizar(req, res, next) {
   try {
-    const id = parseInt(req.params.id, 10);
-    const actualizado = await service.actualizar(id, req.body);
+    const tokenCrudo = req.headers.authorization;
+    const { id } = req.params;
+    const actualizado = await service.actualizar(id, req.body, tokenCrudo);
     res.status(200).json(actualizado);
   } catch (error) {
-    res.status(error.status || 500).json({ error: error.message, detalles: error.detalles });
+    res.status(error.status || 500).json({
+      error: error.message,
+      detalles: error.detalles
+    });
   }
 }
 
