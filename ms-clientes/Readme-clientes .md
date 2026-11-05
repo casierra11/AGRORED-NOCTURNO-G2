@@ -1,4 +1,4 @@
-**\# ms-clientes · Microservicio del Taller 1 (Módulo 3\)**
+**\# ms-clientes · Microservicio del Taller (Módulo 3\)**
 
 **Redes y Servicios Multimedia · UAO · Microservicio de \*\*clientes\*\* de la aplicación,**  
 **con \*\*Node.js \+ Express\*\* organizado en capas. Construido a partir de la plantilla**   
@@ -8,7 +8,13 @@
 
 **\#\# Cómo ejecutarlo**
 
-**Requisitos: Node.js LTS 22 o superior (\`node \-v\`).**
+**Requisitos: Node.js LTS 22 o superior (\`node \-v\`).** y MySQL8 o superior,
+
+1. **Crear la base de datos y su usuario (como root en la consola de MySQL):**
+   ```sql
+   CREATE DATABASE clientes_db;
+   CREATE USER 'clientes_user'@'localhost' IDENTIFIED BY 'una-clave-segura"
+   GRANT ALL PRIVILEGES ON clientes_db.* TO 'clientes_user'@'localhost';
 
 **\`\`\`abre un terminal y ejecuta :** 
 
