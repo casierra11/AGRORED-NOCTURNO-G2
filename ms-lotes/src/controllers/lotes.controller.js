@@ -29,11 +29,14 @@ async function obtenerPorId(req, res, next) {
 
 async function crear(req, res, next) {
   try {
-    const nuevoLote = await service.crear(req.body);
-    // Si todo sale bien (éxito), devuelve 201 y los datos
+    // 1. Extraemos el token ("Bearer eyJhb...") de la cabecera
+    const tokenCrudo = req.headers.authorization; 
+    
+    // 2. Pasamos el token como segundo parámetro al servicio
+    const nuevoLote = await service.crear(req.body, tokenCrudo);
+    
     res.status(201).json(nuevoLote);
   } catch (error) {
-    // Si la validación falla, atrapa el error aquí y devuelve el JSON estructurado
     res.status(error.status || 500).json({
       error: error.message,
       detalles: error.detalles
