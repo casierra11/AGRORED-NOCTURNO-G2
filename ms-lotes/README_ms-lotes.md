@@ -54,3 +54,130 @@ npm run dev
 
 Si todo es correcto, la terminal mostrará el mensaje `ms-usuarios escuchando en http://127.0.0.1:3005`.
 *(Nota: El texto "ms-usuarios" viene de la configuración original del `package.json`, pero el servicio está corriendo correctamente para los lotes).*
+
+
+----------------------------------------------- TALLER 2 -----------------------------------------------
+
+
+# Microservicio de Lotes (ms-lotes) - Contrato de la API
+
+**Proyecto:** AgroRed (Grupo Nocturno G2)
+**Responsable Docente:** Víctor Manuel Salazar
+**Puerto asignado:** 3005
+
+Este microservicio es responsable de gestionar la información de los lotes de producción, incluyendo su código, producto asociado, fecha de producción, cantidad y resultados de calidad. Utiliza persistencia en base de datos relacional (MySQL).
+
+---
+
+## 1. Cómo ejecutarlo
+
+Requisitos: Node.js (v20 o superior) y MySQL (o MariaDB vía XAMPP).
+
+**Paso 1: Crear la base de datos y su usuario**
+Abre tu consola de MySQL o phpMyAdmin y ejecuta:
+
+```sql
+CREATE DATABASE lotes_db;
+CREATE USER 'lotes_user'@'localhost' IDENTIFIED BY 'root';
+GRANT ALL PRIVILEGES ON lotes_db.* TO 'lotes_user'@'localhost';
+FLUSH PRIVILEGES;
+
+```
+
+**Paso 2: Crear la tabla e insertar datos iniciales**
+Ejecuta el código que se encuentra en el archivo `db/schema.sql` dentro de la base de datos `lotes_db` recién creada.
+
+**Paso 3: Instalar dependencias**
+En la terminal, ubicado en la carpeta `ms-lotes`, instala los módulos necesarios (incluyendo el driver de conexión `mysql2`):
+
+```bash
+npm install
+
+```
+
+**Paso 4: Configurar variables de entorno**
+Crea un archivo `.env` en la raíz copiando la estructura de `.env.example` y ajusta tus credenciales de MySQL:
+
+```env
+PORT=3005
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_NAME=lotes_db
+DB_USER=lotes_user
+DB_PASSWORD=root
+
+```
+
+**Paso 5: Levantar el servidor**
+
+```bash
+npm run dev
+
+```
+
+---
+
+## 2. Representación (JSON)
+
+Ejemplo de la estructura de un objeto `lote` al consultar la API:
+
+```json
+{
+  "id": 1,
+  "codigo_lote": "LOT-1001",
+  "producto_id": 10,
+  "fecha_produccion": "2026-10-25",
+  "cantidad": 500,
+  "resultado_calidad": "aprobado"
+}
+
+```
+
+---
+
+## 3. Atributos
+
+| Atributo | Tipo | ¿Obligatorio al crear? | Reglas / Descripción |
+| --- | --- | --- | --- |
+| **id** | Entero | No (lo asigna BD) | Positivo y único. Autoincremental en MySQL. |
+| **codigo_lote** | Texto | Sí | Debe ser único en el sistema. |
+| **producto_id** | Entero | Sí | ID del producto asociado (foráneo lógico). |
+| **fecha_produccion** | Texto (Date) | Sí | Formato YYYY-MM-DD. |
+| **cantidad** | Entero | Sí | Debe ser mayor a `0`. |
+| **resultado_calidad** | Texto | Sí | Estado del lote (ej. `aprobado`, `pendiente`, `rechazado`). |
+
+---
+
+## 4. Endpoints
+
+| Operación | Método | URI | Cuerpo | Respuesta exitosa | Errores posibles |
+| --- | --- | --- | --- | --- | --- |
+| Listar todos | GET | `/lotes` | - | `200` + arreglo | - |
+| Listar (Filtrado) | GET | `/lotes?resultado_calidad=aprobado` | - | `200` + arreglo filtrado | - |
+| Obtener por ID | GET | `/lotes/:id` | - | `200` + objeto | `404` (No encontrado) |
+| Crear | POST | `/lotes` | JSON sin `id` | `201` + objeto creado | `400` (Datos inválidos), `409` (Código duplicado) |
+| Actualizar | PUT | `/lotes/:id` | JSON completo sin `id` | `200` + objeto editado | `400` (Datos inválidos), `404`, `409` |
+| Eliminar | DELETE | `/lotes/:id` | - | `204` (Sin contenido) | `404` (No encontrado) |
+
+---
+
+## 5. Estructura del Repositorio (Arquitectura de Capas)
+
+* **`src/`**: Carpeta principal del código fuente.
+* **`db.js`**: Crea y exporta el *pool* de conexiones a MySQL usando `mysql2/promise`.
+* **`controllers/`**: (`lotes.controller.js`) Recibe peticiones HTTP, extrae datos y arma respuestas.
+* **`services/`**: (`lotes.service.js`) Lógica de negocio, valida cantidades mayores a cero y evita códigos de lote duplicados.
+* **`models/`**: (`lote.js`) Valida y construye la estructura limpia del JSON.
+* **`repositories/`**: (`lotes.repository.js`) Capa de acceso a datos. Ejecuta las sentencias SQL reales usando el pool de conexiones.
+* **`routes/`**: (`lotes.routes.js`) Define las rutas HTTP y las enlaza al controlador.
+
+
+* **`db/`**:
+* **`schema.sql`**: Script de creación de la base de datos, la tabla de lotes y los registros iniciales.
+
+
+* **`docs/`**: Carpeta destinada a almacenar la colección exportada de pruebas en Postman.
+
+---
+
+¿Pasamos ahora a configurar la seguridad de los endpoints implementando el token JWT?
