@@ -1,52 +1,81 @@
 // =====================================================================
-// CAPA DE ACCESO A DATOS (repositorio Lotes)
+// CAPA DE ACCESO A DATOS (repositorio Lotes con MySQL)
 // =====================================================================
-
-const lotes = [
-  { id: 1, codigo_lote: 'LOT-1001', producto_id: 10, fecha_produccion: '2026-10-25', cantidad: 500, resultado_calidad: 'aprobado' },
-  { id: 2, codigo_lote: 'LOT-1002', producto_id: 15, fecha_produccion: '2026-10-26', cantidad: 350, resultado_calidad: 'pendiente' },
-  { id: 3, codigo_lote: 'LOT-1003', producto_id: 22, fecha_produccion: '2026-10-27', cantidad: 120, resultado_calidad: 'rechazado' }
-];
-let siguienteId = 4;
+const db = require('../db'); // Importamos la conexión a la base de datos
 
 async function findAll(filtros = {}) {
-  let resultado = lotes;
-  
-  // Si viene un filtro por estado de cultivo, filtramos el arreglo
-  if (filtros.estado_cultivo) {
-    resultado = resultado.filter((l) => l.estado_cultivo === filtros.estado_cultivo);
+  let query = 'SELECT * FROM lotes';
+  const values = [];
+
+  // Usamos resultado_calidad porque es una columna que existe en tu tabla
+  if (filtros.resultado_calidad) {
+    query += ' WHERE resultado_calidad = ?';
+    values.push(filtros.resultado_calidad);
   }
-  return resultado;
+
+  // db.execute devuelve un arreglo donde la primera posición son las filas (rows)
+  const [rows] = await db.execute(query, values);
+  return rows;
 }
 
 async function findById(id) {
-  return lotes.find((l) => l.id === id) || null;
+  const [rows] = await db.execute('SELECT * FROM lotes WHERE id = ?', [id]);
+  return rows.length > 0 ? rows[0] : null;
 }
 
 async function findByCodigoLote(codigo) {
-  return lotes.find((l) => l.codigo_lote === codigo) || null;
+  const [rows] = await db.execute('SELECT * FROM lotes WHERE codigo_lote = ?', [codigo]);
+  return rows.length > 0 ? rows[0] : null;
 }
 
 async function create(lote) {
-  const nuevo = { id: siguienteId++, ...lote };
-  lotes.push(nuevo);
-  return nuevo;
+  const query = `
+    INSERT INTO lotes (codigo_lote, producto_id, fecha_produccion, cantidad, resultado_calidad) 
+    VALUES (?, ?, ?, ?, ?)
+  `;
+  const values = [
+    lote.codigo_lote,
+    lote.producto_id,
+    lote.fecha_produccion,
+    lote.cantidad,
+    lote.resultado_calidad
+  ];
+
+  // Ejecutamos el INSERT
+  const [result] = await db.execute(query, values);
+
+  // Usamos el insertId generado por MySQL para buscar y retornar el lote recién creado
+  return await findById(result.insertId);
 }
 
 async function update(id, datos) {
-  const index = lotes.findIndex((l) => l.id === id);
-  if (index === -1) return null; // No existe
-  
-  lotes[index] = { ...lotes[index], ...datos, id };
-  return lotes[index];
+  const query = `
+    UPDATE lotes 
+    SET codigo_lote = ?, producto_id = ?, fecha_produccion = ?, cantidad = ?, resultado_calidad = ? 
+    WHERE id = ?
+  `;
+  const values = [
+    datos.codigo_lote,
+    datos.producto_id,
+    datos.fecha_produccion,
+    datos.cantidad,
+    datos.resultado_calidad,
+    id
+  ];
+
+  const [result] = await db.execute(query, values);
+
+  // affectedRows indica cuántas filas se modificaron. Si es 0, el ID no existía.
+  if (result.affectedRows === 0) return null;
+
+  // Retornamos el lote actualizado
+  return await findById(id);
 }
 
 async function remove(id) {
-  const index = lotes.findIndex((l) => l.id === id);
-  if (index === -1) return false; // No existe
-  
-  lotes.splice(index, 1);
-  return true;
+  const [result] = await db.execute('DELETE FROM lotes WHERE id = ?', [id]);
+  // Retorna true si logró borrar la fila, false si no
+  return result.affectedRows > 0;
 }
 
 module.exports = { findAll, findById, findByCodigoLote, create, update, remove };
