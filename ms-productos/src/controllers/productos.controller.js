@@ -69,7 +69,6 @@ async function eliminar(req, res, next) {
   try {
     const id = leerId(req);
     await service.eliminar(id);
-    // Exigencia del taller: 204 No Content sin cuerpo
     res.status(204).end();
   } catch (error) {
     next(error);

@@ -6,13 +6,19 @@ function verificarToken(req, res, next) {
     return res.status(401).json({ error: 'Token no proporcionado' });
   }
 
-  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
+  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : authHeader.trim();
+
+  // IMPRIME ESTOS DOS VALORES EN CONSOLA:
+  console.log('--- DEPURACIÓN JWT ---');
+  console.log('Token recibido:', token);
+  console.log('Secret utilizado:', process.env.JWT_SECRET || '123');
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'frase_secreta_acordada_por_el_grupo');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || '123');
     req.usuario = decoded;
     next();
   } catch (error) {
+    console.log('Error de JWT:', error.message); // Imprime la causa exacta del fallo
     return res.status(401).json({ error: 'Token inválido o expirado' });
   }
 }
