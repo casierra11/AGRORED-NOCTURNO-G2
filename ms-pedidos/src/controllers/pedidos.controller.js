@@ -35,14 +35,16 @@ async function obtener(req, res) {
 
 // POST /pedidos
 async function crear(req, res) {
-  const nuevo = await service.crear(req.body);
+  const token = req.headers.authorization; // Capturamos el token Bearer
+  const nuevo = await service.crear(req.body, token); // Lo pasamos al servicio
   res.status(201).location(`${req.baseUrl}/${nuevo.id}`).json(nuevo);
 }
 
 // PUT /pedidos/:id
 async function actualizar(req, res) {
   const id = leerId(req);
-  const actualizado = await service.actualizar(id, req.body);
+  const token = req.headers.authorization; // Capturamos el token Bearer
+  const actualizado = await service.actualizar(id, req.body, token); // Lo pasamos al servicio
   res.status(200).json(actualizado);
 }
 

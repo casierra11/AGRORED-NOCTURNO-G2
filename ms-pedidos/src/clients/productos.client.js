@@ -20,7 +20,7 @@ async function pedir(ruta, token) {
 // VALIDACIÓN: ¿existe el producto? Si ms-productos no responde → 503
 async function existeProducto(id, token) {
   const respuesta = await pedir(`/productos/${id}`, token);
-  if (!respuesta) throw new HttpError(503, 'ms-productos não está disponible');
+if (!respuesta) throw new HttpError(503, 'ms-productos no está disponible');
   if (respuesta.status === 404) return false;
   if (!respuesta.ok) {
     throw new HttpError(502, `ms-productos respondió ${respuesta.status}`);
