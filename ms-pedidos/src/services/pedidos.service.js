@@ -5,18 +5,43 @@
 // =====================================================================
 const repo = require('../repositories/pedidos.repository');
 const { validarPedido, construirPedido } = require('../models/pedido');
-const { existeProducto } = require('../clients/productos.client');
-const { existeCliente } = require('../clients/clientes.client');
+const { existeProducto, productosPorIds } = require('../clients/productos.client');
+const { existeCliente, clientesPorIds } = require('../clients/clientes.client');
 const HttpError = require('../utils/http-error');
 
-async function listar(filtros) {
-  return repo.findAll(filtros);
+async function listar(filtros, token) {
+  const pedidos = await repo.findAll(filtros);
+  if (pedidos.length === 0) return [];
+
+  // Extraer IDs únicos de productos y clientes para la consulta por lotes
+  const productoIds = [...new Set(pedidos.map((p) => p.producto_id))];
+  const clienteIds = [...new Set(pedidos.map((p) => p.cliente_id))];
+
+  // Consultar en lote a los otros microservicios (con tolerancia a fallos)
+  const productosMap = await productosPorIds(productoIds, token);
+  const clientesMap = await clientesPorIds(clienteIds, token);
+
+  // Enriquecer cada pedido con los datos compuestos
+  return pedidos.map((p) => ({
+    ...p,
+    cliente: clientesMap ? clientesMap.get(p.cliente_id) || null : null,
+    producto: productosMap ? productosMap.get(p.producto_id) || null : null,
+  }));
 }
 
-async function obtener(id) {
+async function obtener(id, token) {
   const pedido = await repo.findById(id);
   if (!pedido) throw new HttpError(404, `No existe el pedido con id ${id}`);
-  return pedido;
+
+  // Consultar la información del producto y cliente para este pedido específico
+  const productosMap = await productosPorIds([pedido.producto_id], token);
+  const clientesMap = await clientesPorIds([pedido.cliente_id], token);
+
+  return {
+    ...pedido,
+    cliente: clientesMap ? clientesMap.get(pedido.cliente_id) || null : null,
+    producto: productosMap ? productosMap.get(pedido.producto_id) || null : null,
+  };
 }
 
 async function crear(datos, token) {
