@@ -18,8 +18,8 @@ Aplicación web distribuida basada en microservicios para la gestión agroindust
 | Carpeta | Entidad | Responsable | Puerto | Depende de (Referencias) |
 | :--- | :--- | :--- | :--- | :--- |
 | `ms-usuarios` | Usuario | Docente | 3001 | Ninguno |
-| `ms-productos` | Productos | Brandon Montilla (`Brandon1927`) | 3002 | Ninguno |
-| `ms-clientes` | Clientes | Juan David Rios (`JDRios17`) | 3003 | Ninguno |
+| `ms-clientes` | Clientes | Juan David Rios (`JDRios17`) | 3002 | Ninguno |
+|`ms-productos` | Productos | Brandon Montilla (`Brandon1927`) | 3003 | Ninguno |
 | `ms-pedidos` | Pedidos | Juan Camilo Casierra (`casierra11`) | 3004 | Clientes, Productos |
 | `ms-lotes` | Lotes | Víctor Manuel Salazar (`VictorSalazar30`) | 3005 | Productos |
 
