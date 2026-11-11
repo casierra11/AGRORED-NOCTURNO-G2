@@ -21,4 +21,4 @@ router.post('/', requiereRol('administrador', 'comercial'), controller.crear);
 router.put('/:id', requiereRol('administrador', 'comercial'), controller.actualizar);
 router.delete('/:id', requiereRol('administrador'), controller.eliminar);
 
-module.exports = router;
+module.exports = router; 
