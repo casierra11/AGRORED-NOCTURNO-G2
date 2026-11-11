@@ -7,7 +7,7 @@ const pool = require('../db');
 
 // 1. Listar con soporte de filtros (por centro de distribución y por ids con ?ids=)
 async function findAll(filtros = {}) {
-    let query = 'SELECT * FROM orders WHERE 1=1';
+    let query = 'SELECT * FROM pedidos WHERE 1=1';
     let params = [];
 
     if (filtros.centro_distribucion) {
@@ -16,8 +16,9 @@ async function findAll(filtros = {}) {
     }
 
     if (filtros.ids && filtros.ids.length > 0) {
-        query += ' AND id IN (?)';
-        params.push(filtros.ids);
+        const placeholders = filtros.ids.map(() => '?').join(',');
+        query += ` AND id IN (${placeholders})`;
+        params.push(...filtros.ids);
     }
 
     const [rows] = await pool.query(query, params);
@@ -26,7 +27,7 @@ async function findAll(filtros = {}) {
 
 // 2. Buscar por ID
 async function findById(id) {
-    const [rows] = await pool.query('SELECT * FROM orders WHERE id = ?', [id]);
+    const [rows] = await pool.query('SELECT * FROM pedidos WHERE id = ?', [id]);
     return rows[0] || null;
 }
 
@@ -34,7 +35,7 @@ async function findById(id) {
 async function create(pedido) {
     const { cliente_id, producto_id, cantidad, centro_distribucion, estado, fecha } = pedido;
     const [result] = await pool.query(
-        'INSERT INTO orders (cliente_id, producto_id, cantidad, centro_distribucion, estado, fecha) VALUES (?, ?, ?, ?, ?, ?)',
+        'INSERT INTO pedidos (cliente_id, producto_id, cantidad, centro_distribucion, estado, fecha) VALUES (?, ?, ?, ?, ?, ?)',
         [cliente_id, producto_id, cantidad, centro_distribucion, estado, fecha]
     );
     
@@ -60,7 +61,7 @@ async function update(id, datosNuevos) {
     const fecha = datosNuevos.fecha !== undefined ? datosNuevos.fecha : pedidoExistente.fecha;
 
     await pool.query(
-        'UPDATE orders SET cliente_id = ?, producto_id = ?, cantidad = ?, centro_distribucion = ?, estado = ?, fecha = ? WHERE id = ?',
+        'UPDATE pedidos SET cliente_id = ?, producto_id = ?, cantidad = ?, centro_distribucion = ?, estado = ?, fecha = ? WHERE id = ?',
         [cliente_id, producto_id, cantidad, centro_distribucion, estado, fecha, Number(id)]
     );
 
@@ -73,7 +74,7 @@ async function remove(id) {
     if (!pedido) {
         return false; // No existe el pedido
     }
-    await pool.query('DELETE FROM orders WHERE id = ?', [Number(id)]);
+    await pool.query('DELETE FROM pedidos WHERE id = ?', [Number(id)]);
     return true;
 }
 
