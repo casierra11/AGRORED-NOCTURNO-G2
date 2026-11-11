@@ -7,9 +7,9 @@ const service = require('../services/lotes.service');
 
 async function obtenerTodos(req, res, next) {
   try {
-    // Cambiamos estado_cultivo por resultado_calidad
     const filtros = { resultado_calidad: req.query.resultado_calidad };
-    const lotes = await service.obtenerTodos(filtros);
+    const token = req.headers.authorization;
+    const lotes = await service.obtenerTodos(filtros, token);
     res.status(200).json(lotes);
   } catch (error) {
     next(error);
@@ -18,9 +18,9 @@ async function obtenerTodos(req, res, next) {
 
 async function obtenerPorId(req, res, next) {
   try {
-    // Convertimos el id de la URL (que es texto) a número
     const id = parseInt(req.params.id, 10);
-    const lote = await service.obtenerPorId(id);
+    const token = req.headers.authorization;
+    const lote = await service.obtenerPorId(id, token);
     res.status(200).json(lote);
   } catch (error) {
     next(error);
@@ -29,32 +29,22 @@ async function obtenerPorId(req, res, next) {
 
 async function crear(req, res, next) {
   try {
-    // 1. Extraemos el token ("Bearer eyJhb...") de la cabecera
-    const tokenCrudo = req.headers.authorization; 
-    
-    // 2. Pasamos el token como segundo parámetro al servicio
-    const nuevoLote = await service.crear(req.body, tokenCrudo);
-    
+    const token = req.headers.authorization;
+    const nuevoLote = await service.crear(req.body, token);
     res.status(201).json(nuevoLote);
   } catch (error) {
-    res.status(error.status || 500).json({
-      error: error.message,
-      detalles: error.detalles
-    });
+    next(error);
   }
 }
 
 async function actualizar(req, res, next) {
   try {
-    const tokenCrudo = req.headers.authorization;
-    const { id } = req.params;
-    const actualizado = await service.actualizar(id, req.body, tokenCrudo);
+    const id = parseInt(req.params.id, 10);
+    const token = req.headers.authorization;
+    const actualizado = await service.actualizar(id, req.body, token);
     res.status(200).json(actualizado);
   } catch (error) {
-    res.status(error.status || 500).json({
-      error: error.message,
-      detalles: error.detalles
-    });
+    next(error);
   }
 }
 

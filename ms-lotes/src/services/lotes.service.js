@@ -1,30 +1,61 @@
 // =====================================================================
 // CAPA DE SERVICIO (lógica de negocio)
 // Aplica las reglas del negocio y las validaciones.
-// No sabe nada de HTTP (req/res) ni de cómo se guardan los datos.
+// No conoce HTTP (req/res) ni la base de datos directamente.
 // =====================================================================
 const repo = require('../repositories/lotes.repository');
-const { validarLote, construirLote } = require('../models/lote');
+const { construirLote } = require('../models/lote');
 const HttpError = require('../utils/http-error');
-
-// 1. IMPORTAMOS EL CLIENTE HTTP
 const productosClient = require('../clients/productos.client');
 
-async function obtenerTodos(filtros) {
-  return await repo.findAll(filtros);
+// 1. RELACIÓN AL ESCRIBIR: Valida que el producto exista en ms-productos
+// Si ms-productos está caído, existeProducto lanza un error 503 automáticamente (Caso 24)
+async function validarProducto(productoId, token) {
+  const existe = await productosClient.existeProducto(productoId, token);
+  if (!existe) {
+    throw new HttpError(400, `No existe el producto con id ${productoId}`);
+  }
 }
 
-async function obtenerPorId(id) {
+// 2. RELACIÓN AL LEER: Composición con UNA sola consulta ?ids= y degradación controlada
+async function componer(lotes, token) {
+  if (!lotes || lotes.length === 0) return [];
+
+  // Extraemos los IDs únicos de producto presentes en la lista
+  const ids = [...new Set(lotes.map((l) => l.producto_id).filter(Boolean))];
+  const productos = await productosClient.productosPorIds(ids, token);
+
+  // Si ms-productos está apagado -> Degradación controlada (producto: null + aviso)
+  if (!productos) {
+    return lotes.map((l) => ({
+      ...l,
+      producto: null,
+      aviso: 'ms-productos no disponible'
+    }));
+  }
+
+  // Si respondió -> Incrustamos el objeto producto correspondiente a cada lote
+  return lotes.map((l) => ({
+    ...l,
+    producto: productos.get(l.producto_id) || null
+  }));
+}
+
+async function obtenerTodos(filtros, token) {
+  const lotes = await repo.findAll(filtros);
+  return await componer(lotes, token);
+}
+
+async function obtenerPorId(id, token) {
   const lote = await repo.findById(id);
   if (!lote) {
     throw new HttpError(404, `No existe el lote con id ${id}`);
   }
-  return lote;
+  const [compuesto] = await componer([lote], token);
+  return compuesto;
 }
 
-// 2. Función crear adaptada para pruebas locales en Postman
 async function crear(datos, token) {
-  // Validaciones básicas locales
   const errores = [];
   if (!datos.producto_id) errores.push("producto_id es obligatorio");
   if (!datos.cantidad || datos.cantidad <= 0) errores.push("cantidad es obligatoria y debe ser mayor a 0");
@@ -33,31 +64,18 @@ async function crear(datos, token) {
     throw new HttpError(400, "Datos inválidos", errores);
   }
 
-  // Validar código duplicado localmente
   const existe = await repo.findByCodigoLote(datos.codigo_lote);
   if (existe) {
     throw new HttpError(409, `Ya existe un lote con el código ${datos.codigo_lote}`);
   }
 
-  // 3. COMUNICACIÓN SÍNCRONA (Con tolerancia a fallos para pruebas locales)
-  try {
-    const productoExiste = await productosClient.verificarProductoExiste(datos.producto_id, token);
-    if (!productoExiste) {
-      throw new HttpError(400, "Integridad referencial fallida", [`El producto con ID ${datos.producto_id} no existe en el sistema AgroRed.`]);
-    }
-  } catch (error) {
-    // Si el microservicio de productos está apagado, permitimos continuar 
-    // la prueba local para que Postman devuelva el 201 Created correctamente.
-    if (error.status === 503) {
-      console.warn("Advertencia: ms-productos no disponible. Omitiendo validación externa para prueba local.");
-    } else {
-      throw error; // Si es un error 400 real, lo lanzamos
-    }
-  }
+  // Validación síncrona obligatoria: si ms-productos falla, lanza 400 o 503
+  await validarProducto(datos.producto_id, token);
 
-  // 4. Si todo está bien, construimos el objeto limpio y guardamos en MySQL
   const loteLimpio = construirLote(datos);
-  return await repo.create(loteLimpio);
+  const nuevoLote = await repo.create(loteLimpio);
+  const [compuesto] = await componer([nuevoLote], token);
+  return compuesto;
 }
 
 async function actualizar(id, datos, token) {
@@ -69,33 +87,21 @@ async function actualizar(id, datos, token) {
     throw new HttpError(400, "Datos inválidos", errores);
   }
 
-  // Verificar que el nuevo código no le pertenezca a OTRO lote distinto
   const existe = await repo.findByCodigoLote(datos.codigo_lote);
-  if (existe && existe.id !== parseInt(id)) {
+  if (existe && existe.id !== parseInt(id, 10)) {
     throw new HttpError(409, `Ya existe otro lote con el código ${datos.codigo_lote}`);
   }
 
-  // Validación síncrona opcional con tolerancia a fallos para el PUT
-  try {
-    const productoExiste = await productosClient.verificarProductoExiste(datos.producto_id, token);
-    if (!productoExiste) {
-      throw new HttpError(400, "Integridad referencial fallida", [`El producto con ID ${datos.producto_id} no existe en el sistema AgroRed.`]);
-    }
-  } catch (error) {
-    if (error.status === 503) {
-      console.warn("Advertencia: ms-productos no disponible en PUT. Omitiendo validación externa.");
-    } else {
-      throw error;
-    }
-  }
+  await validarProducto(datos.producto_id, token);
 
   const loteLimpio = construirLote(datos);
   const actualizado = await repo.update(id, loteLimpio);
-  
   if (!actualizado) {
     throw new HttpError(404, `No existe el lote con id ${id}`);
   }
-  return actualizado;
+
+  const [compuesto] = await componer([actualizado], token);
+  return compuesto;
 }
 
 async function eliminar(id) {

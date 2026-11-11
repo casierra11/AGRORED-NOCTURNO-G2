@@ -26,7 +26,7 @@
       "response": []
     },
     {
-      "name": "Lotes",
+      "name": "Caso 01 - Listar todos (200)",
       "request": {
         "method": "GET",
         "header": [],
@@ -45,7 +45,32 @@
       "response": []
     },
     {
-      "name": "Buscar Lote (Exito)",
+      "name": "Caso 02 - Filtro resultado_calidad (200)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3005/lotes?resultado_calidad=aprobado",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3005",
+          "path": [
+            "lotes"
+          ],
+          "query": [
+            {
+              "key": "resultado_calidad",
+              "value": "aprobado"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Caso 03 - Filtro id (200)",
       "request": {
         "method": "GET",
         "header": [],
@@ -65,7 +90,7 @@
       "response": []
     },
     {
-      "name": "Lote (Error)",
+      "name": "Caso 05 - Obtener ID inexistente (404)",
       "request": {
         "method": "GET",
         "header": [],
@@ -85,7 +110,7 @@
       "response": []
     },
     {
-      "name": "Crear Lote (Exito 201)",
+      "name": "Caso 07 - Crear lote (201)",
       "request": {
         "method": "POST",
         "header": [],
@@ -113,35 +138,7 @@
       "response": []
     },
     {
-      "name": "Crear Lote (Error 409)",
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\"codigo_lote\": \"LOT-1005\", \r\n\"producto_id\": 15, \r\n\"fecha_produccion\": \"2026-10-30\", \r\n\"cantidad\": 450, \r\n\"resultado_calidad\": \"aprobado\"}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:3005/lotes",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "3005",
-          "path": [
-            "lotes"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Crear Lote (Error 400)",
+      "name": "Caso 08 - Crear falta atributo (400)",
       "request": {
         "method": "POST",
         "header": [],
@@ -169,13 +166,13 @@
       "response": []
     },
     {
-      "name": "Ingreso sin Token",
+      "name": "Caso 09 - Crear codigo duplicado (409)",
       "request": {
         "method": "POST",
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n  \"codigo_lote\": \"LOT-9999\",\r\n  \"producto_id\": 5,\r\n  \"fecha_produccion\": \"2026-11-04\",\r\n  \"cantidad\": 100,\r\n  \"resultado_calidad\": \"aprobado\"\r\n}",
+          "raw": "{\"codigo_lote\": \"LOT-1005\", \r\n\"producto_id\": 15, \r\n\"fecha_produccion\": \"2026-10-30\", \r\n\"cantidad\": 450, \r\n\"resultado_calidad\": \"aprobado\"}",
           "options": {
             "raw": {
               "language": "json"
@@ -197,45 +194,7 @@
       "response": []
     },
     {
-      "name": "Ingreso con Token",
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "{{json_web_token_05nr}}",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n  \"codigo_lote\": \"LOT-1001\",\r\n  \"producto_id\": 5,\r\n  \"fecha_produccion\": \"2026-11-04\",\r\n  \"cantidad\": 100,\r\n  \"resultado_calidad\": \"aprobado\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:3005/lotes",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "3005",
-          "path": [
-            "lotes"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "PUT CAMBIAR LOTE",
+      "name": "Caso 10 - Actualizar lote (200)",
       "request": {
         "auth": {
           "type": "bearer",
@@ -274,7 +233,7 @@
       "response": []
     },
     {
-      "name": "Eliminar Lote",
+      "name": "Caso 12 - Eliminar lote (204)",
       "request": {
         "auth": {
           "type": "bearer",
@@ -304,12 +263,469 @@
       "response": []
     },
     {
-      "name": "Filtro resultado_calidad",
+      "name": "00. Login Admin (200)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"email\": \"admin@empresa.com\",\r\n  \"password\": \"Admin2026*\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3001/usuarios/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3001",
+          "path": [
+            "usuarios",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "00. Login Rol Ventas (200)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"email\": \"consulta@empresa.com\",\r\n  \"password\": \"Consulta2026*\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3001/usuarios/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3001",
+          "path": [
+            "usuarios",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "00. Crear Usuario Rol Ventas (201)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_1a12}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"nombre\": \"Operador Consulta\",\r\n  \"email\": \"consulta@empresa.com\",\r\n  \"password\": \"Consulta2026*\",\r\n  \"rol\": \"administrador\",\r\n  \"activo\": true\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3001/usuarios",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3001",
+          "path": [
+            "usuarios"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Caso 14 - Peticion sin token (401)",
       "request": {
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:3005/lotes?resultado_calidad=aprobado",
+          "raw": "http://localhost:3005/lotes",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3005",
+          "path": [
+            "lotes"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Caso 15 - Token alterado (401)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "token_invalido_xyz123",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3005/lotes",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3005",
+          "path": [
+            "lotes"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Caso 16 - GET rol consulta (200)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_03v9}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3005/lotes",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3005",
+          "path": [
+            "lotes"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Caso 17 - POST rol no autorizado (403)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_03v9}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"codigo_lote\": \"LOT-9901\",\r\n  \"producto_id\": 1,\r\n  \"fecha_produccion\": \"2026-11-10\",\r\n  \"cantidad\": 100,\r\n  \"resultado_calidad\": \"pendiente\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3005/lotes",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3005",
+          "path": [
+            "lotes"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Caso 18 - POST rol autorizado (201)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_1a12}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"codigo_lote\": \"LOT-9902\",\r\n  \"producto_id\": 1,\r\n  \"fecha_produccion\": \"2026-11-10\",\r\n  \"cantidad\": 200,\r\n  \"resultado_calidad\": \"pendiente\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3005/lotes",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3005",
+          "path": [
+            "lotes"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Caso 19 - Crear lote producto valido (201 compuesto)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_1a12}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"codigo_lote\": \"LOT-2005\",\r\n  \"producto_id\": 2,\r\n  \"fecha_produccion\": \"2026-11-11\",\r\n  \"cantidad\": 300,\r\n  \"resultado_calidad\": \"aprobado\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3005/lotes",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3005",
+          "path": [
+            "lotes"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Caso 20 - Crear producto inexistente (400)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_1a12}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"codigo_lote\": \"LOT-2002\",\r\n  \"producto_id\": 999,\r\n  \"fecha_produccion\": \"2026-11-11\",\r\n  \"cantidad\": 150,\r\n  \"resultado_calidad\": \"pendiente\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3005/lotes",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3005",
+          "path": [
+            "lotes"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Caso 21 - Obtener lote por ID compuesto (200)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_1a12}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3005/lotes/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3005",
+          "path": [
+            "lotes",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Caso 22 - Listar lotes compuesto ids (200)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_1a12}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3005/lotes",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3005",
+          "path": [
+            "lotes"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Caso 23 - Listar degradado productos offline (200)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_1a12}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3005/lotes",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3005",
+          "path": [
+            "lotes"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Caso 24 - Crear con productos offline (503)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_1a12}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"codigo_lote\": \"LOT-2003\",\r\n  \"producto_id\": 1,\r\n  \"fecha_produccion\": \"2026-11-11\",\r\n  \"cantidad\": 50,\r\n  \"resultado_calidad\": \"aprobado\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3005/lotes?Content-Type=application/json",
           "protocol": "http",
           "host": [
             "localhost"
@@ -320,9 +736,39 @@
           ],
           "query": [
             {
-              "key": "resultado_calidad",
-              "value": "aprobado"
+              "key": "Content-Type",
+              "value": "application/json"
             }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Prueba de token",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_03v9}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3003/productos/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3003",
+          "path": [
+            "productos",
+            "1"
           ]
         }
       },
@@ -332,6 +778,14 @@
   "variable": [
     {
       "key": "json_web_token_05nr",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_1a12",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_03v9",
       "secret": true
     }
   ]

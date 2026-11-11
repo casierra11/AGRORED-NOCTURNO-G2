@@ -2,20 +2,21 @@
 // CAPA DE PRESENTACIÓN (rutas)
 // Asocia cada método HTTP + URI con una función del controlador.
 // =====================================================================
-const express = require('express');
-const router = express.Router();
+const { Router } = require('express');
+const router = Router();
 const controller = require('../controllers/lotes.controller');
-const { verificarTokenAdmin } = require('../middlewares/auth.middleware'); // Importamos el guardia de seguridad
+const { verificarToken, requiereRol } = require('../middlewares/auth');
 
-// Definición de los endpoints para la entidad Lotes
+// 1. TODAS las rutas exigen token válido (Casos 14, 15 y 16)
+router.use(verificarToken);
 
-// Rutas PÚBLICAS (cualquiera puede consultar sin token)
+// 2. Rutas de consulta (Lectura)
 router.get('/', controller.obtenerTodos);
 router.get('/:id', controller.obtenerPorId);
 
-// Rutas PROTEGIDAS (inyectamos el middleware antes del controlador)
-router.post('/', verificarTokenAdmin, controller.crear);
-router.put('/:id', verificarTokenAdmin, controller.actualizar);
-router.delete('/:id', verificarTokenAdmin, controller.eliminar);
+// 3. Rutas de modificación (Escritura restringida por rol: Casos 17 y 18)
+router.post('/', requiereRol('administrador', 'produccion'), controller.crear);
+router.put('/:id', requiereRol('administrador', 'produccion'), controller.actualizar);
+router.delete('/:id', requiereRol('administrador', 'produccion'), controller.eliminar);
 
 module.exports = router;
