@@ -3,7 +3,7 @@
 // entre ms-pedidos y ms-clientes.
 // =====================================================================
 const HttpError = require('../utils/http-error');
-const CLIENTES_URL = process.env.CLIENTES_URL || 'http://localhost:3003';
+const CLIENTES_URL = process.env.CLIENTES_URL || 'http://localhost:3002';
 
 async function pedir(ruta, token) {
   try {

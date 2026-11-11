@@ -3,7 +3,7 @@
 // entre ms-pedidos y ms-productos.
 // =====================================================================
 const HttpError = require('../utils/http-error');
-const PRODUCTOS_URL = process.env.PRODUCTOS_URL || 'http://localhost:3002';
+const PRODUCTOS_URL = process.env.PRODUCTOS_URL || 'http://localhost:3003';
 
 // Hace la petición reenviando el token del usuario. null si no hubo respuesta.
 async function pedir(ruta, token) {
