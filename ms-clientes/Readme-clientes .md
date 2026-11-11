@@ -2,7 +2,8 @@
 
 **Redes y Servicios Multimedia · UAO · Microservicio de clientes de la aplicación**, con **Node.js + Express** organizado en capas. Construido a partir de la plantilla base, adaptando todas las capas a la entidad de clientes.
 
-**Esta es la versión del Taller 1 y 2 : datos en memoria y operaciones principales.**
+**Esta es la versión del Taller 1 y 2 cd ms-clientes
+: datos en memoria y operaciones principales.**
 
 ## Cómo ejecutarlo
 
