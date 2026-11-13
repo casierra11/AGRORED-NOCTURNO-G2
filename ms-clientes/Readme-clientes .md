@@ -70,7 +70,7 @@ Los tipos válidos para los clientes son: distribuidor o comercio.
 ## Relaciones
 Como ms-clientes es un servicio consultado por otros microservicios de la arquitectura AgroRed, se documenta a continuación quién realiza peticiones y los contratos de datos asociados:
 
-## Subconsultas de Pedidos 
+## subsección de Pedidos 
 
 | Atributo | Microservicio consultado | Para validar (al crear y actualizar) | Para componer (al consultar) | Datos que usa |
 | :--- | :--- | :--- | :--- | :--- |
