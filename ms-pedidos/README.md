@@ -19,7 +19,7 @@ npm run dev          # inicia y se reinicia solo al guardar cambios
 
 ```
 
-Prueben en el navegador o Postman: `http://localhost:3004/health` y `http://localhost:3004/pedidos`
+Prueba en el navegador o Postman: `http://localhost:3004/health` y `http://localhost:3004/pedidos`
 
 ---
 
