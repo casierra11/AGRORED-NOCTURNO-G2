@@ -28,6 +28,16 @@
     {
       "name": "Caso 01 - Listar todos (200)",
       "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_18i8}}",
+              "type": "string"
+            }
+          ]
+        },
         "method": "GET",
         "header": [],
         "url": {
@@ -47,6 +57,16 @@
     {
       "name": "Caso 02 - Filtro resultado_calidad (200)",
       "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_18i8}}",
+              "type": "string"
+            }
+          ]
+        },
         "method": "GET",
         "header": [],
         "url": {
@@ -70,12 +90,57 @@
       "response": []
     },
     {
-      "name": "Caso 03 - Filtro id (200)",
+      "name": "Caso 03 - Filtro resultado_calidad (400)",
       "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_18i8}}",
+              "type": "string"
+            }
+          ]
+        },
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:3005/lotes/4",
+          "raw": "http://localhost:3005/lotes?resultado_calidad=invalido",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3005",
+          "path": [
+            "lotes"
+          ],
+          "query": [
+            {
+              "key": "resultado_calidad",
+              "value": "invalido"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Caso 04 - Filtro id (200)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_18i8}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3005/lotes/1",
           "protocol": "http",
           "host": [
             "localhost"
@@ -83,7 +148,7 @@
           "port": "3005",
           "path": [
             "lotes",
-            "4"
+            "1"
           ]
         }
       },
@@ -92,6 +157,16 @@
     {
       "name": "Caso 05 - Obtener ID inexistente (404)",
       "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_18i8}}",
+              "type": "string"
+            }
+          ]
+        },
         "method": "GET",
         "header": [],
         "url": {
@@ -112,11 +187,21 @@
     {
       "name": "Caso 07 - Crear lote (201)",
       "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_18i8}}",
+              "type": "string"
+            }
+          ]
+        },
         "method": "POST",
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\"codigo_lote\": \"LOT-1001\", \r\n\"producto_id\": 18, \r\n\"fecha_produccion\": \"2026-11-5\", \r\n\"cantidad\": 450, \r\n\"resultado_calidad\": \"aprobado\"}",
+          "raw": "{\"codigo_lote\": \"LOT-1006\", \r\n\"producto_id\": 1, \r\n\"fecha_produccion\": \"2026-11-5\", \r\n\"cantidad\": 450, \r\n\"resultado_calidad\": \"aprobado\"}",
           "options": {
             "raw": {
               "language": "json"
@@ -140,6 +225,16 @@
     {
       "name": "Caso 08 - Crear falta atributo (400)",
       "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_18i8}}",
+              "type": "string"
+            }
+          ]
+        },
         "method": "POST",
         "header": [],
         "body": {
@@ -168,11 +263,21 @@
     {
       "name": "Caso 09 - Crear codigo duplicado (409)",
       "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_18i8}}",
+              "type": "string"
+            }
+          ]
+        },
         "method": "POST",
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\"codigo_lote\": \"LOT-1005\", \r\n\"producto_id\": 15, \r\n\"fecha_produccion\": \"2026-10-30\", \r\n\"cantidad\": 450, \r\n\"resultado_calidad\": \"aprobado\"}",
+          "raw": "{\"codigo_lote\": \"LOT-1005\", \r\n\"producto_id\": 1, \r\n\"fecha_produccion\": \"2026-10-30\", \r\n\"cantidad\": 450, \r\n\"resultado_calidad\": \"aprobado\"}",
           "options": {
             "raw": {
               "language": "json"
@@ -201,7 +306,46 @@
           "bearer": [
             {
               "key": "token",
-              "value": "{{json_web_token_05nr}}",
+              "value": "{{json_web_token_18i8}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"codigo_lote\": \"LOT-1010\",\r\n  \"producto_id\": 2,\r\n  \"fecha_produccion\": \"2026-11-13\",\r\n  \"cantidad\": 250,\r\n  \"resultado_calidad\": \"aprobado\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3005/lotes/2",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3005",
+          "path": [
+            "lotes",
+            "2"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Caso 11 - Actualizar lote inexistente (404)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_18i8}}",
               "type": "string"
             }
           ]
@@ -240,7 +384,37 @@
           "bearer": [
             {
               "key": "token",
-              "value": "{{json_web_token_05nr}}",
+              "value": "{{json_web_token_18i8}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3005/lotes/3",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3005",
+          "path": [
+            "lotes",
+            "3"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Caso 13 - Eliminar lote inexistente (404)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_18i8}}",
               "type": "string"
             }
           ]
@@ -274,7 +448,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n  \"email\": \"admin@empresa.com\",\r\n  \"password\": \"Admin2026*\"\r\n}",
+          "raw": "{\r\n  \"email\": \"admin@empresa.com\",\r\n  \"password\": \"Consulta2026*\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -291,6 +465,49 @@
           "path": [
             "usuarios",
             "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "00. Crear Usuario Rol Ventas (201)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{json_web_token_18i8}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"nombre\": \"Operador Consulta\",\r\n  \"email\": \"consulta@empresa.com\",\r\n  \"password\": \"Consulta2026*\",\r\n  \"rol\": \"ventas\",\r\n  \"activo\": true\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3001/usuarios",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3001",
+          "path": [
+            "usuarios"
           ]
         }
       },
@@ -325,49 +542,6 @@
           "path": [
             "usuarios",
             "login"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "00. Crear Usuario Rol Ventas (201)",
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "{{json_web_token_1a12}}",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n  \"nombre\": \"Operador Consulta\",\r\n  \"email\": \"consulta@empresa.com\",\r\n  \"password\": \"Consulta2026*\",\r\n  \"rol\": \"administrador\",\r\n  \"activo\": true\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:3001/usuarios",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "3001",
-          "path": [
-            "usuarios"
           ]
         }
       },
@@ -429,7 +603,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "{{json_web_token_03v9}}",
+              "value": "{{json_web_token_18et}}",
               "type": "string"
             }
           ]
@@ -458,7 +632,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "{{json_web_token_03v9}}",
+              "value": "{{json_web_token_18et}}",
               "type": "string"
             }
           ]
@@ -496,7 +670,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "{{json_web_token_1a12}}",
+              "value": "{{json_web_token_18i8}}",
               "type": "string"
             }
           ]
@@ -534,7 +708,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "{{json_web_token_1a12}}",
+              "value": "{{json_web_token_18i8}}",
               "type": "string"
             }
           ]
@@ -548,7 +722,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n  \"codigo_lote\": \"LOT-2005\",\r\n  \"producto_id\": 2,\r\n  \"fecha_produccion\": \"2026-11-11\",\r\n  \"cantidad\": 300,\r\n  \"resultado_calidad\": \"aprobado\"\r\n}",
+          "raw": "{\r\n  \"codigo_lote\": \"LOT-2006\",\r\n  \"producto_id\": 2,\r\n  \"fecha_produccion\": \"2026-11-11\",\r\n  \"cantidad\": 300,\r\n  \"resultado_calidad\": \"aprobado\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -577,7 +751,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "{{json_web_token_1a12}}",
+              "value": "{{json_web_token_18i8}}",
               "type": "string"
             }
           ]
@@ -620,7 +794,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "{{json_web_token_1a12}}",
+              "value": "{{json_web_token_18i8}}",
               "type": "string"
             }
           ]
@@ -650,7 +824,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "{{json_web_token_1a12}}",
+              "value": "{{json_web_token_18i8}}",
               "type": "string"
             }
           ]
@@ -679,7 +853,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "{{json_web_token_1a12}}",
+              "value": "{{json_web_token_18i8}}",
               "type": "string"
             }
           ]
@@ -708,7 +882,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "{{json_web_token_1a12}}",
+              "value": "{{json_web_token_18i8}}",
               "type": "string"
             }
           ]
@@ -786,6 +960,18 @@
     },
     {
       "key": "json_web_token_03v9",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_0w9b",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_18i8",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_18et",
       "secret": true
     }
   ]
