@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgroRed · Iniciar sesión</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <div class="entrada">
+    <section class="sala">
+      <div>
+        <h1>AgroRed</h1>
+        <p>Gestión logística, control de pedidos, productos y distribución en un solo lugar.</p>
+      </div>
+      <div class="estante-deco" aria-hidden="true">
+        <span style="background:#2d6a4f;height:92%">Cali</span>
+        <span style="background:#1b4332;height:78%">Bogotá</span>
+        <span style="background:#40916c;height:64%">Medellín</span>
+        <span style="background:#2d6a4f;height:86%">Logística</span>
+        <span style="background:#1b4332;height:70%">Pedidos</span>
+        <span style="background:#52b788;height:96%">Distribución</span>
+        <span style="background:#2d6a4f;height:74%">Inventario</span>
+        <span style="background:#1b4332;height:82%">Clientes</span>
+      </div>
+    </section>
+
+    <section class="acceso">
+      <form id="form-login" novalidate>
+        <h2>Iniciar sesión</h2>
+        <p class="indicacion">Use el email y la contraseña de su cuenta.</p>
+        <label class="campo"><span>Email</span>
+          <input name="email" type="email" autocomplete="username" required>
+        </label>
+        <label class="campo"><span>Contraseña</span>
+          <input name="password" type="password" autocomplete="current-password" required>
+        </label>
+        <button class="boton" type="submit">Entrar</button>
+        <p class="error-acceso" id="error-login" role="alert"></p>
+      </form>
+    </section>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/sesion.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    const form = document.getElementById('form-login');
+    const error = document.getElementById('error-login');
+
+    const yaEntro = usuarioActual();
+    if (yaEntro) location.href = PAGINA_POR_ROL[yaEntro.rol];
+
+    form.onsubmit = async (evento) => {
+      evento.preventDefault();
+      error.textContent = '';
+      const email = form.elements.email.value.trim();
+      const password = form.elements.password.value;
+      if (!email || !password) {
+        error.textContent = 'Escriba el email y la contraseña.';
+        return;
+      }
+      try {
+        await iniciarSesion(email, password);
+      } catch (e) {
+        error.textContent = e.status === 401 ? 'Email o contraseña incorrectos.' : e.message;
+      }
+    };
+  </script>
+</body>
+</html>

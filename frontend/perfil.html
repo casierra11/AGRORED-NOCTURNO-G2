@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgroRed · Mi perfil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <header class="barra">
+    <div class="barra-superior">
+      <span class="marca">AgroRed · Gestión Logística</span>
+      <div class="persona">
+        <span><strong id="nombre-usuario"></strong> <span class="rol" id="rol-usuario"></span></span>
+        <button id="cerrar-sesion" type="button">Cerrar sesión</button>
+      </div>
+    </div>
+    <nav id="menu" aria-label="Secciones">
+      <a href="pedidos.html">Pedidos</a>
+      <a href="usuarios.html">Usuarios</a>
+      <a href="perfil.html" aria-current="page">Mi perfil</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="cabecera-seccion">
+      <div>
+        <h1>Mi perfil</h1>
+        <p class="resumen">Sus datos, tal como los tiene ms-usuarios.</p>
+      </div>
+    </div>
+    <dl class="ficha-perfil" id="perfil"></dl>
+    <p class="nota">Para cambiar estos datos o su contraseña, pida ayuda al administrador del sistema.</p>
+  </main>
+  <div id="mensajes"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/sesion.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/perfil.js"></script>
+</body>
+</html>

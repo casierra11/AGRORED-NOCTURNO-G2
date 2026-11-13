@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgroRed · Usuarios</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <header class="barra">
+    <div class="barra-superior">
+      <span class="marca">AgroRed · Gestión Logística</span>
+      <div class="persona">
+        <span><strong id="nombre-usuario"></strong> <span class="rol" id="rol-usuario"></span></span>
+        <button id="cerrar-sesion" type="button">Cerrar sesión</button>
+      </div>
+    </div>
+    <nav id="menu" aria-label="Secciones">
+      <a href="pedidos.html">Pedidos</a>
+      <a href="usuarios.html" aria-current="page">Usuarios</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="cabecera-seccion">
+      <div>
+        <h1>Usuarios</h1>
+        <p class="resumen" id="resumen">Cargando…</p>
+      </div>
+      <div class="herramientas">
+        <button class="boton" id="nuevo">Crear usuario</button>
+      </div>
+    </div>
+    <div class="tabla-envoltura">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th scope="col">Nombre</th>
+            <th scope="col">Email</th>
+            <th scope="col">Rol</th>
+            <th scope="col">Estado</th>
+            <th scope="col"><span class="oculto">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody id="lista"></tbody>
+      </table>
+    </div>
+  </main>
+  <div id="mensajes"></div>
+  <dialog id="dialogo"></dialog>
+
+  <script src="js/config.js"></script>
+  <script src="js/sesion.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/usuarios.js"></script>
+</body>
+</html>
