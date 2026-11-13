@@ -74,4 +74,4 @@ Como ms-clientes es un servicio consultado por otros microservicios de la arquit
 
 | Me consulta | Peticiones que me hace | Campos que no puedo cambiar sin avisar |
 | :--- | :--- | :--- |
-| **ms-pedidos** | `GET /clientes/:id` · `GET /clientes?ids=...` | `id`, `nombre`, `ciudad` `tipo`  `NIT`|
+| **ms-pedidos** | `GET /clientes/:id` · `GET /clientes?ids=...` | `id`, `nombre`, `ciudad` `tipo`  |
