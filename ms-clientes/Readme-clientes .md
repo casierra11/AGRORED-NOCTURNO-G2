@@ -74,7 +74,7 @@ Como ms-clientes es un servicio consultado por otros microservicios de la arquit
 
 | Atributo | Microservicio consultado | Para validar (al crear y actualizar) | Para componer (al consultar) | Datos que usa |
 | :--- | :--- | :--- | :--- | :--- |
-| **cliente_id** | `ms-clientes` | `GET /clientes/:id` | `GET /clientes?ids=...` | `id`, `nombre`, `ciudad` |
+| **cliente_id** | `ms-clientes` | `GET /clientes/:id` | `GET /clientes?ids=...` | `id`, `nombre`, `ciudad`,`tipo` |
 
 
 | Me consulta | Peticiones que me hace | Campos que no puedo cambiar sin avisar |
