@@ -113,4 +113,94 @@ Todas las rutas requieren la cabecera `Authorization: Bearer <token>` emitida po
 ```json
 // Request Body
 {
-  "codigo_lote":
+  "codigo_lote": "LOT-2001",
+  "producto_id": 1,
+  "fecha_produccion": "2026-10-26",
+  "cantidad": 350,
+  "resultado_calidad": "aprobado"
+}
+```
+```json
+// Response (201 Created)
+{
+  "id": 2,
+  "codigo_lote": "LOT-2001",
+  "producto_id": 1,
+  "fecha_produccion": "2026-10-26",
+  "cantidad": 350,
+  "resultado_calidad": "aprobado",
+  "producto": {
+    "id": 1,
+    "nombre": "Aguacate Hass",
+    "categoria": "Fruta"
+  }
+}
+```
+
+**Listar lotes (`GET /lotes`):**
+```json
+// Response (200 OK)
+[
+  {
+    "id": 1,
+    "codigo_lote": "LOT-1001",
+    "producto_id": 1,
+    "fecha_produccion": "2026-10-26",
+    "cantidad": 350,
+    "resultado_calidad": "aprobado",
+    "producto": {
+      "id": 1,
+      "nombre": "Aguacate Hass",
+      "categoria": "Fruta"
+    }
+  }
+]
+```
+
+---
+
+## 4. Relaciones con Otros Microservicios
+
+El microservicio `ms-lotes` mantiene una relación de dependencia síncrona con `ms-productos` (puerto `3003`) reenviando el token JWT del cliente:
+
+| Atributo | Microservicio consultado | Para validar (al crear y actualizar) | Para componer (al consultar) | Datos que usa |
+| :--- | :--- | :--- | :--- | :--- |
+| **`producto_id`** | `ms-productos` (puerto `3003`) | `GET /productos/:id` | `GET /productos?ids=...` | `id`, `nombre`, `categoria` |
+
+* **Política ante fallos de `ms-productos`:**
+  * En operaciones de **escritura** (`POST` / `PUT`), si `ms-productos` no responde o supera el *timeout* de 3 segundos, `ms-lotes` rechaza la operación con **`503 Service Unavailable`** para preservar la integridad referencial.
+  * En operaciones de **lectura** (`GET`), aplica **degradación controlada**, retornando **`200 OK`** con los datos locales del lote, `"producto": null` y el campo informativo `"aviso"`.
+
+---
+
+## 5. Estructura del Repositorio (Arquitectura en Capas)
+
+```text
+ms-lotes/
+├── db/
+│   └── schema.sql                       # Script SQL de creación de tabla y datos iniciales
+├── docs/
+│   └── Agrored.postman_collection.json  # Colección de pruebas exportada (v2.1)
+├── src/
+│   ├── clients/
+│   │   └── productos.client.js          # Cliente HTTP hacia ms-productos (validación y ?ids=)
+│   ├── controllers/
+│   │   └── lotes.controller.js          # Capa de presentación HTTP (req / res)
+│   ├── middlewares/
+│   │   └── auth.js                      # Verificación de JWT y control de roles (RBAC)
+│   ├── models/
+│   │   └── lote.js                      # Estructura y validaciones de formato del recurso
+│   ├── repositories/
+│   │   └── lotes.repository.js          # Consultas parametrizadas SQL sobre MySQL
+│   ├── routes/
+│   │   └── lotes.routes.js              # Definición de endpoints y permisos por rol
+│   ├── services/
+│   │   └── lotes.service.js             # Reglas de negocio, composición y resiliencia
+│   ├── utils/
+│   │   └── http-error.js                # Clase personalizada para manejo de errores HTTP
+│   ├── app.js                           # Configuración de Express y middlewares globales
+│   ├── db.js                            # Pool de conexiones a MySQL (mysql2/promise)
+│   └── index.js                         # Punto de entrada del servidor (puerto 3005)
+├── .env.example                         # Plantilla de variables de entorno
+└── package.json                         # Dependencias y scripts de ejecución
+```
