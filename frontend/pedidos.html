@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Pedidos - AgroRed</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+  <header class="barra">
+    <div class="barra-superior">
+      <div class="marca">AgroRed · Gestión Logística</div>
+      <div class="persona">
+        <div>
+          <span id="nombre-usuario" style="font-weight: 600;">Cargando...</span>
+          <span class="rol" id="rol-usuario"></span>
+        </div>
+        <button id="cerrar-sesion" type="button">Cerrar sesión</button>
+      </div>
+    </div>
+    <nav id="menu">
+      <a href="pedidos.html" aria-current="page">Pedidos</a>
+      <a href="usuarios.html">Usuarios</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="cabecera-seccion">
+      <div>
+        <h1>Pedidos</h1>
+        <p class="resumen" id="resumen">Cargando pedidos...</p>
+      </div>
+      <div class="herramientas">
+        <input type="search" id="busqueda-centro" placeholder="Filtrar por centro (ej. Cali)...">
+        <button class="boton" id="nuevo">Nuevo pedido</button>
+      </div>
+    </div>
+
+    <div class="tabla-envoltura">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Centro Distribución</th>
+            <th>Estado</th>
+            <th>Fecha</th>
+            <th style="text-align: right;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="lista">
+          <!-- Los pedidos se cargan dinámicamente con JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <div id="mensajes" aria-live="polite"></div>
+  <dialog id="dialogo"></dialog>
+
+  <script src="js/config.js"></script>
+  <script src="js/sesion.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/pedidos.js"></script>
+</body>
+</html>

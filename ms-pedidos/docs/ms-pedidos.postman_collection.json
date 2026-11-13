@@ -230,6 +230,170 @@
         }
       },
       "response": []
+    },
+    {
+      "name": "14 -pedidos sin token -> 401",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "15 - pedidos con token alterado -> 401",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "16 -pedidos con token de rol permitido -> 200",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "17 - pedidos con rol sin permiso -> 403",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "18 - pedidos con token de administrador -> 201",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"cliente_id\": 1,\r\n  \"producto_id\": 1,\r\n  \"cantidad\": 40,\r\n  \"centro_distribucion\": \"Bogotá\",\r\n  \"estado\": \"recibido\",\r\n  \"fecha\": \"2026-11-12\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "19 - Crear con referencia válida -> 201",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"cliente_id\": 1,\r\n  \"producto_id\": 1,\r\n  \"cantidad\": 30,\r\n  \"centro_distribucion\": \"Cali\",\r\n  \"estado\": \"recibido\",\r\n  \"fecha\": \"2026-11-12\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3004/pedidos",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3004",
+          "path": [
+            "pedidos"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "20 - Crear con referencia inexistente -> 400",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"cliente_id\": 9999,\r\n  \"producto_id\": 1,\r\n  \"cantidad\": 30,\r\n  \"centro_distribucion\": \"Cali\",\r\n  \"estado\": \"recibido\",\r\n  \"fecha\": \"2026-11-12\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3004/pedidos",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3004",
+          "path": [
+            "pedidos"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "21 - Obtener por ID con relaciones -> 200",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "22 - Listar con consulta por lotes en terminal -> 200",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "23 - Listar con microservicio externo detenido -> 200",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "24 - Crear con microservicio externo detenido -> 503",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
     }
   ]
 }
