@@ -2,8 +2,7 @@
 
 **Redes y Servicios Multimedia · UAO · Microservicio de clientes de la aplicación**, con **Node.js + Express** organizado en capas. Construido a partir de la plantilla base, adaptando todas las capas a la entidad de clientes.
 
-**Esta es la versión del Taller 1 y 2 cd ms-clientes
-: datos en memoria y operaciones principales.**
+**Esta es la versión del Taller 1 y 2:** datos en persistencia MySQL y operaciones principales.
 
 ## Cómo ejecutarlo
 
@@ -15,24 +14,23 @@
    CREATE DATABASE clientes_db;
    CREATE USER 'clientes_user'@'localhost' IDENTIFIED BY 'una-clave-segura';
    GRANT ALL PRIVILEGES ON clientes_db.* TO 'clientes_user'@'localhost';
-   ```
 
-2. **Abrir un terminal y ejecutar:**
+   Abrir un terminal y ejecutar:
 
-   ```bash
-   npm install
-   copy .env.example .env
-   npm run dev
-   ```
+Bash
+npm install
+copy .env.example .env
+npm run dev
 
-   En Linux/Mac, utiliza `cp .env.example .env` en lugar de `copy`.
+En Linux/Mac, utiliza cp .env.example .env en lugar de copy.
 
-3. **Probar en el navegador o Postman:**
+Probar en el navegador o Postman:
 
-   - http://localhost:3002/health
-   - http://localhost:3002/clientes
+http://localhost:3002/health
 
-## Capas
+http://localhost:3002/clientes
+
+## Capas 
 
 | Archivo | Capa | Responsabilidad |
 | :--- | :--- | :--- |
@@ -41,9 +39,10 @@
 | **src/routes/clientes.routes.js** | **Presentación** | Método HTTP + URI → función del controlador. |
 | **src/controllers/clientes.controller.js** | **Presentación** | Lee la petición, llama al servicio y arma la respuesta. |
 | **src/services/clientes.service.js** | **Lógica de negocio** | Validaciones y reglas (NIT único); no conoce HTTP ni la base de datos. |
-| **src/repositories/clientes.repository.js** | **Acceso a datos** | Guarda y consulta los datos (en memoria en el Taller 1 y 2 ). |
+| **src/repositories/clientes.repository.js** | **Acceso a datos** | Guarda y consulta los datos en MySQL. |
 | **src/models/cliente.js** | **Modelo** | Atributos de la entidad y su validación. |
 | **src/utils/http-error.js** | **Utilidad** | Error con código de estado HTTP. |
+
 
 ## Endpoints (Taller 1 y 2)
 
@@ -58,7 +57,6 @@
 
 ## Ejemplo de cuerpo para POST / PUT
 
-```json
 {
   "nombre": "Distribuidora del Valle",
   "nit": "900123456-1",
@@ -66,6 +64,14 @@
   "telefono": "3101234567",
   "tipo": "distribuidor"
 }
-```
 
-**Los tipos válidos para los clientes son:** `distribuidor` o `comercio`.
+Los tipos válidos para los clientes son: distribuidor o comercio.
+
+## Relaciones
+Como ms-clientes es un servicio consultado por otros microservicios de la arquitectura AgroRed, se documenta a continuación quién realiza peticiones y los contratos de datos asociados:
+
+## Subconsultas de Pedidos 
+
+| Me consulta | Peticiones que me hace | Campos que no puedo cambiar sin avisar |
+| :--- | :--- | :--- |
+| **ms-pedidos** | `GET /clientes/:id` · `GET /clientes?ids=...` | `id`, `nombre`, `ciudad` `tipo`  `NIT`|
