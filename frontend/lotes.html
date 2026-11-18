@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Lotes - AgroRed</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+  <header class="barra">
+    <div class="barra-superior">
+      <div class="marca">AgroRed · Gestión Logística</div>
+      <div class="persona">
+        <div>
+          <span id="nombre-usuario" style="font-weight: 600;">Cargando...</span>
+          <span class="rol" id="rol-usuario"></span>
+        </div>
+        <button id="cerrar-sesion" type="button">Cerrar sesión</button>
+      </div>
+    </div>
+    <nav id="menu">
+      <a href="pedidos.html">Pedidos</a>
+      <a href="productos.html">Productos</a>
+      <a href="lotes.html" aria-current="page">Lotes</a>
+      <a href="usuarios.html">Usuarios</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="cabecera-seccion">
+      <div>
+        <h1>Lotes de Producción</h1>
+        <p class="resumen" id="resumen">Cargando lotes...</p>
+      </div>
+      <div class="herramientas">
+        <select id="filtro-calidad" style="padding: 0.55rem 0.8rem; border-radius: 8px; border: 1px solid #cbd5e1;">
+          <option value="">Todos los estados</option>
+          <option value="aprobado">Aprobado</option>
+          <option value="pendiente">Pendiente</option>
+          <option value="rechazado">Rechazado</option>
+        </select>
+        <input type="search" id="busqueda-codigo" placeholder="Buscar por código (ej. LOT-1001)...">
+        <button class="boton" id="nuevo">Nuevo lote</button>
+      </div>
+    </div>
+
+    <div class="tabla-envoltura">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Código Lote</th>
+            <th>Producto</th>
+            <th>Fecha Producción</th>
+            <th>Cantidad</th>
+            <th>Control de Calidad</th>
+            <th style="text-align: right;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="lista"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <div id="mensajes" aria-live="polite"></div>
+
+  <dialog id="dialogo" style="border: none; border-radius: 12px; padding: 1.5rem; max-width: 460px; width: 92%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15);">
+    <form id="form-lote" method="dialog" style="display: flex; flex-direction: column; gap: 1rem;">
+      <h2 id="titulo-dialogo" style="margin: 0; font-size: 1.25rem;">Nuevo lote</h2>
+
+      <label style="display: flex; flex-direction: column; gap: 0.35rem; font-weight: 500;">
+        <span>Código de Lote</span>
+        <input name="codigo_lote" type="text" maxlength="50" required placeholder="Ej: LOT-1004" style="padding: 0.55rem; border: 1px solid #cbd5e1; border-radius: 8px;">
+      </label>
+
+      <label style="display: flex; flex-direction: column; gap: 0.35rem; font-weight: 500;">
+        <span>Producto</span>
+        <select name="producto_id" id="select-producto" required style="padding: 0.55rem; border: 1px solid #cbd5e1; border-radius: 8px;">
+          <option value="">Cargando productos...</option>
+        </select>
+      </label>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+        <label style="display: flex; flex-direction: column; gap: 0.35rem; font-weight: 500;">
+          <span>Fecha de Producción</span>
+          <input name="fecha_produccion" type="date" required style="padding: 0.55rem; border: 1px solid #cbd5e1; border-radius: 8px;">
+        </label>
+
+        <label style="display: flex; flex-direction: column; gap: 0.35rem; font-weight: 500;">
+          <span>Cantidad</span>
+          <input name="cantidad" type="number" min="1" step="1" required placeholder="Ej: 500" style="padding: 0.55rem; border: 1px solid #cbd5e1; border-radius: 8px;">
+        </label>
+      </div>
+
+      <label style="display: flex; flex-direction: column; gap: 0.35rem; font-weight: 500;">
+        <span>Resultado de Calidad</span>
+        <select name="resultado_calidad" required style="padding: 0.55rem; border: 1px solid #cbd5e1; border-radius: 8px;">
+          <option value="pendiente">Pendiente</option>
+          <option value="aprobado">Aprobado</option>
+          <option value="rechazado">Rechazado</option>
+        </select>
+      </label>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.5rem;">
+        <button type="button" id="btn-cancelar" style="padding: 0.55rem 1rem; border-radius: 8px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer;">Cancelar</button>
+        <button type="submit" id="btn-guardar" class="boton">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="js/config.js"></script>
+  <script src="js/sesion.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/lotes.js"></script>
+</body>
+</html>
