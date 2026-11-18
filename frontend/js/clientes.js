@@ -10,6 +10,39 @@
   const formEl = document.getElementById('form-cliente');
   const tituloDlgEl = document.getElementById('titulo-dialogo');
 
+  // Inicializar cabecera de sesión (nombre, rol y botón cerrar sesión)
+  if (typeof iniciarSesion === 'function') iniciarSesion();
+  if (typeof pintarUsuario === 'function') pintarUsuario();
+  if (typeof cargarUsuarioActual === 'function') cargarUsuarioActual();
+
+  // Respaldo directo leyendo el payload del JWT por si la función de ui.js tiene otro nombre
+  (function mostrarDatosCabecera() {
+    const elNombre = document.getElementById('nombre-usuario');
+    const elRol = document.getElementById('rol-usuario');
+    const btnSalir = document.getElementById('cerrar-sesion');
+
+    if (btnSalir) {
+      btnSalir.addEventListener('click', () => {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = 'login.html';
+      });
+    }
+
+    const tok = obtenerToken();
+    if (!tok) return;
+    try {
+      const base64 = tok.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+      const payload = JSON.parse(decodeURIComponent(escape(atob(base64))));
+      if (elNombre && (payload.nombre || payload.name || payload.email)) {
+        elNombre.textContent = payload.nombre || payload.name || payload.email;
+      }
+      if (elRol && payload.rol) {
+        elRol.textContent = payload.rol;
+      }
+    } catch {}
+  })();
+
   function obtenerToken() {
     for (const store of [localStorage, sessionStorage]) {
       for (const key of ['token', 'agrored.token', 'jwt', 'authToken']) {
