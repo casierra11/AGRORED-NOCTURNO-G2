@@ -1,4 +1,4 @@
-//esquem de bases de de datos para la tabla clientes
+-- esquem de bases de de datos para la tabla clientes
 SET names utf8mb4;
 
 CREATE TABLE clientes(
@@ -7,7 +7,7 @@ nombre VARCHAR(100) NOT NULL,
 nit VARCHAR(20) NOT NULL UNIQUE,
 ciudad VARCHAR(50) NOT NULL,
 telefono VARCHAR(20) NOT NULL,
-tipo ENUM('comercio', 'distribuidor') NOT NULL,
+tipo ENUM('comercio', 'distribuidor') NOT NULL
 );
 insert into clientes(nombre, nit, ciudad, telefono, tipo) values
 ('Juan Perez', '123456789', 'Bogotá', '3001234567', 'comercio'),

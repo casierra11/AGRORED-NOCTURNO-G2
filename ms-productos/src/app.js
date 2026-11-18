@@ -13,6 +13,8 @@ app.use(express.json());
 // 3. Servimos la carpeta public que creaste en la raíz del proyecto
 app.use(express.static(path.join(__dirname, '../public')));
 
+app.get('/health', (req, res) => res.json({ servicio: 'ms-productos', estado: 'ok' }));
+
 app.use('/productos', productosRoutes);
 
 // Middleware global de manejo de errores estandarizado (400, 404, 409, 500)
