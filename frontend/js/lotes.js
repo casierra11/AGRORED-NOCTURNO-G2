@@ -11,39 +11,12 @@
   const formEl = document.getElementById('form-lote');
   const tituloDlgEl = document.getElementById('titulo-dialogo');
   const selectProductoEl = document.getElementById('select-producto');
+  const btnNuevoEl = document.getElementById('nuevo');
 
   // Inicializar cabecera de sesión (nombre, rol y botón cerrar sesión)
   if (typeof iniciarSesion === 'function') iniciarSesion();
   if (typeof pintarUsuario === 'function') pintarUsuario();
   if (typeof cargarUsuarioActual === 'function') cargarUsuarioActual();
-
-  // Respaldo directo leyendo el payload del JWT por si la función de ui.js tiene otro nombre
-  (function mostrarDatosCabecera() {
-    const elNombre = document.getElementById('nombre-usuario');
-    const elRol = document.getElementById('rol-usuario');
-    const btnSalir = document.getElementById('cerrar-sesion');
-
-    if (btnSalir) {
-      btnSalir.addEventListener('click', () => {
-        localStorage.clear();
-        sessionStorage.clear();
-        window.location.href = 'login.html';
-      });
-    }
-
-    const tok = obtenerToken();
-    if (!tok) return;
-    try {
-      const base64 = tok.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-      const payload = JSON.parse(decodeURIComponent(escape(atob(base64))));
-      if (elNombre && (payload.nombre || payload.name || payload.email)) {
-        elNombre.textContent = payload.nombre || payload.name || payload.email;
-      }
-      if (elRol && payload.rol) {
-        elRol.textContent = payload.rol;
-      }
-    } catch {}
-  })();
 
   function obtenerToken() {
     for (const store of [localStorage, sessionStorage]) {
@@ -59,6 +32,48 @@
     return '';
   }
 
+  function obtenerUsuarioToken() {
+    const tok = obtenerToken();
+    if (!tok) return null;
+    try {
+      const base64 = tok.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+      return JSON.parse(decodeURIComponent(escape(atob(base64))));
+    } catch {
+      return null;
+    }
+  }
+
+  const usuarioSesion = obtenerUsuarioToken();
+  const puedeEditar = ['administrador', 'produccion'].includes(usuarioSesion?.rol);
+
+  // Ocultar botón de creación si el rol es de solo lectura (ej. comercial)
+  if (btnNuevoEl && !puedeEditar) {
+    btnNuevoEl.style.display = 'none';
+  }
+
+  // Cabecera de usuario y cierre de sesión
+  (function mostrarDatosCabecera() {
+    const elNombre = document.getElementById('nombre-usuario');
+    const elRol = document.getElementById('rol-usuario');
+    const btnSalir = document.getElementById('cerrar-sesion');
+
+    if (btnSalir) {
+      btnSalir.addEventListener('click', () => {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = 'login.html';
+      });
+    }
+
+    if (!usuarioSesion) return;
+    if (elNombre && (usuarioSesion.nombre || usuarioSesion.name || usuarioSesion.email)) {
+      elNombre.textContent = usuarioSesion.nombre || usuarioSesion.name || usuarioSesion.email;
+    }
+    if (elRol && usuarioSesion.rol) {
+      elRol.textContent = usuarioSesion.rol;
+    }
+  })();
+
   function notificar(texto, esError = false) {
     const box = document.getElementById('mensajes');
     if (!box) return alert(texto);
@@ -66,7 +81,25 @@
     p.textContent = texto;
     p.style.cssText = `position:fixed;bottom:1rem;right:1rem;padding:0.75rem 1.1rem;border-radius:8px;color:#fff;font-weight:500;z-index:9999;background:${esError ? '#b91c1c' : '#166534'};`;
     box.appendChild(p);
-    setTimeout(() => p.remove(), 3500);
+    setTimeout(() => p.remove(), 4000);
+  }
+
+  function mostrarBannerAviso(textoAviso) {
+    let banner = document.getElementById('banner-aviso-lotes');
+    if (!textoAviso) {
+      if (banner) banner.remove();
+      return;
+    }
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'banner-aviso-lotes';
+      banner.setAttribute('role', 'status');
+      banner.style.cssText =
+        'background:#fef9c3;color:#854d0e;border:1px solid #fde047;padding:0.75rem 1rem;border-radius:8px;margin-bottom:1rem;font-size:0.92rem;font-weight:500;';
+      const tabla = listaEl.closest('table') || listaEl.parentElement;
+      tabla.parentElement.insertBefore(banner, tabla);
+    }
+    banner.textContent = `Aviso: No se pudieron cargar los detalles de productos (${textoAviso}). Se muestran los datos locales de los lotes.`;
   }
 
   async function reqApi(path, options = {}) {
@@ -81,10 +114,20 @@
       body: options.body ? JSON.stringify(options.body) : undefined,
     });
 
+    if (res.status === 401) {
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = 'login.html';
+      return null;
+    }
+
     if (res.status === 204) return null;
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      throw new Error(data.error || `Error ${res.status}`);
+      const detalle = Array.isArray(data.detalles) && data.detalles.length
+        ? `: ${data.detalles.join(', ')}`
+        : '';
+      throw new Error((data.error || `Error ${res.status}`) + detalle);
     }
     return data;
   }
@@ -105,6 +148,7 @@
   }
 
   async function cargarCatalogoProductos() {
+    if (!selectProductoEl) return;
     try {
       const lista = await reqApi('/productos');
       productosMap = {};
@@ -113,11 +157,11 @@
         productosMap[p.id] = p;
         const opt = document.createElement('option');
         opt.value = p.id;
-        opt.textContent = `#${p.id} · ${p.nombre} (${p.unidad})`;
+        opt.textContent = `#${p.id} · ${p.nombre} (${p.unidad || p.categoria || ''})`;
         selectProductoEl.appendChild(opt);
       }
     } catch {
-      selectProductoEl.innerHTML = '<option value="">No se pudieron cargar productos</option>';
+      selectProductoEl.innerHTML = '<option value="">Servicio de productos no disponible</option>';
     }
   }
 
@@ -134,6 +178,9 @@
   }
 
   function renderizar() {
+    const registroConAviso = lotes.find((l) => l.aviso);
+    mostrarBannerAviso(registroConAviso ? registroConAviso.aviso : null);
+
     const q = busquedaEl.value.trim().toLowerCase();
     const filtrados = q
       ? lotes.filter((l) => l.codigo_lote.toLowerCase().includes(q))
@@ -148,11 +195,10 @@
     }
 
     for (const l of filtrados) {
-      // Soporta tanto objeto enriquecido (l.producto.nombre) como ID plano (l.producto_id)
       const prodNombre =
         l.producto?.nombre ||
         productosMap[l.producto_id]?.nombre ||
-        `Producto #${l.producto_id}`;
+        `Producto #${l.producto_id} (sin detalle)`;
       const unidad =
         l.producto?.unidad ||
         productosMap[l.producto_id]?.unidad ||
@@ -167,17 +213,24 @@
         <td>${l.cantidad} ${unidad}</td>
         <td>${badgeCalidad(l.resultado_calidad)}</td>
         <td style="text-align:right; white-space:nowrap;">
-          <button type="button" class="btn-editar" style="margin-right:0.4rem;padding:0.35rem 0.7rem;border-radius:6px;border:1px solid #cbd5e1;background:#fff;cursor:pointer;">Editar</button>
-          <button type="button" class="btn-eliminar" style="padding:0.35rem 0.7rem;border-radius:6px;border:1px solid #fecaca;background:#fef2f2;color:#b91c1c;cursor:pointer;">Eliminar</button>
+          ${
+            puedeEditar
+              ? `<button type="button" class="btn-editar" style="margin-right:0.4rem;padding:0.35rem 0.7rem;border-radius:6px;border:1px solid #cbd5e1;background:#fff;cursor:pointer;">Editar</button>
+                 <button type="button" class="btn-eliminar" style="padding:0.35rem 0.7rem;border-radius:6px;border:1px solid #fecaca;background:#fef2f2;color:#b91c1c;cursor:pointer;">Eliminar</button>`
+              : '<span style="color:#94a3b8;font-size:0.82rem;">Solo lectura</span>'
+          }
         </td>
       `;
-      tr.querySelector('.btn-editar').addEventListener('click', () => abrirModal(l));
-      tr.querySelector('.btn-eliminar').addEventListener('click', () => eliminarLote(l));
+      if (puedeEditar) {
+        tr.querySelector('.btn-editar').addEventListener('click', () => abrirModal(l));
+        tr.querySelector('.btn-eliminar').addEventListener('click', () => eliminarLote(l));
+      }
       listaEl.appendChild(tr);
     }
   }
 
   function abrirModal(lote = null) {
+    if (!puedeEditar) return;
     editId = lote ? lote.id : null;
     tituloDlgEl.textContent = lote ? `Editar lote ${lote.codigo_lote}` : 'Nuevo lote';
     formEl.reset();
@@ -229,7 +282,7 @@
     }
   });
 
-  document.getElementById('nuevo').addEventListener('click', () => abrirModal());
+  if (btnNuevoEl) btnNuevoEl.addEventListener('click', () => abrirModal());
   document.getElementById('btn-cancelar').addEventListener('click', () => dialogoEl.close());
   filtroCalidadEl.addEventListener('change', cargarLotes);
   busquedaEl.addEventListener('input', renderizar);
