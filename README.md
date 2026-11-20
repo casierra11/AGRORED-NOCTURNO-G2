@@ -1,129 +1,64 @@
-# AgroRed S.A. – Sistema de Gestión Agroindustrial y Distribución (Arquitectura de Microservicios)
+# AgroRed S.A. – Grupo Nocturno G2 (`AGRORED-NOCTURNO-G2`)
 
-Aplicación web distribuida basada en microservicios con **Node.js (Express)**, persistencia aislada por servicio en **MySQL 8**, resolución de nombres con **BIND9** y puerta de enlace única (**API Gateway**) con **Apache HTTP Server**.
-
-## Integrantes del Grupo
-
-| Integrante | Usuario de GitHub | Microservicio a cargo |
-| :--- | :--- | :--- |
-| Juan Camilo Casierra Riascos | `casierra11` | `ms-pedidos` |
-| Brandon Montilla Hernández | `Brandon1927` | `ms-productos` |
-| Juan David Rios Gallego | `JDRios17` | `ms-clientes` |
-| Víctor Manuel Salazar Chaparro | `VictorSalazar30` | `ms-lotes` |
+Aplicación web distribuida basada en una arquitectura de **microservicios con Node.js (Express)** para la gestión agroindustrial, logística y de distribución de AgroRed, con persistencia aislada por servicio en **MySQL 8** (*Database-per-Service*), resolución de nombres con **BIND9** y puerta de enlace única (**API Gateway**) con **Apache HTTP Server**.
 
 ---
 
-## Tabla de Microservicios
+## 1. Integrantes del Grupo
 
-| Carpeta | Entidad | Responsable | Puerto | Depende de (Referencias) |
+| Integrante | Usuario de GitHub | Código | Rol en Despliegue | Microservicio a cargo |
 | :--- | :--- | :--- | :--- | :--- |
-| `ms-usuarios` | Usuario | Docente | 3001 | Ninguno |
-| `ms-clientes` | Clientes | Juan David Rios (`JDRios17`) | 3002 | Ninguno |
-| `ms-productos` | Productos | Brandon Montilla (`Brandon1927`) | 3003 | Ninguno |
-| `ms-pedidos` | Pedidos | Juan Camilo Casierra (`casierra11`) | 3004 | Clientes, Productos |
-| `ms-lotes` | Lotes | Víctor Manuel Salazar (`VictorSalazar30`) | 3005 | Productos |
+| **Víctor Manuel Salazar Chaparro** | `VictorSalazar30` | 2221679 | Coordinador y Relator | `ms-lotes` (Puerto 3005) |
+| **Juan Camilo Casierra Riascos** | `casierra11` | 2226055 | Integrador de aplicación | `ms-pedidos` (Puerto 3004) |
+| **Brandon Montilla Hernández** | `Brandon1927` | 2220324 | Arquitecto | `ms-productos` (Puerto 3003) |
+| **Juan David Ríos Gallego** | `JDRios17` | 2225674 | Integrador de datos y Documentador | `ms-clientes` (Puerto 3002) |
 
 ---
 
-## 1. Arquitectura y Topología de Red
+## 2. Tabla de Microservicios y Dependencias
 
-El sistema opera sobre dos servidores virtuales Ubuntu 22.04 en red privada *Host-Only* y el anfitrión Windows:
-
-- **`servidorUbuntu1` (`172.16.0.197`)**: Servidor DNS (`bind9`) y motor de base de datos (`MySQL`).
-- **`servidorUbuntu2` (`172.16.0.198`)**: API Gateway (`Apache2` en puerto `80`), archivos estáticos del frontend (`/var/www/app`) y los 5 microservicios ejecutándose como servicios `systemd` bajo el usuario sin privilegios `nodeapps` (escuchando exclusivamente en `127.0.0.1`).
-
-| Componente | Servidor | Dirección IP | Puerto | Base de Datos / Ruta | Acceso permitido |
+| Carpeta | Entidad | Responsable | Puerto | Base de Datos | Depende de (Referencias REST) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **DNS (`bind9`)** | `servidorUbuntu1` | `172.16.0.197` | 53 (UDP/TCP) | Zona `agrored.com` (`app` → `172.16.0.198`) | Red local (Windows y VMs) |
-| **MySQL Server** | `servidorUbuntu1` | `172.16.0.197` | 3306 (TCP) | 5 esquemas independientes (`usuarios_db`, `clientes_db`, `productos_db`, `pedidos_db`, `lotes_db`) | Solo `servidorUbuntu2` (`172.16.0.198` + `ufw`) |
-| **Apache Gateway** | `servidorUbuntu2` | `172.16.0.198` | 80 (TCP) | `/var/www/app` y `/api/*` | Clientes Windows (`[http://app.agrored.com](http://app.agrored.com)`) |
-| **`ms-usuarios`** | `servidorUbuntu2` | `127.0.0.1` | 3001 (TCP) | `usuarios_db` / `/api/usuarios` | Solo local (`127.0.0.1` vía Apache) |
-| **`ms-clientes`** | `servidorUbuntu2` | `127.0.0.1` | 3002 (TCP) | `clientes_db` / `/api/clientes` | Solo local (`127.0.0.1` vía Apache y REST local) |
-| **`ms-productos`** | `servidorUbuntu2` | `127.0.0.1` | 3003 (TCP) | `productos_db` / `/api/productos` | Solo local (`127.0.0.1` vía Apache y REST local) |
-| **`ms-pedidos`** | `servidorUbuntu2` | `127.0.0.1` | 3004 (TCP) | `pedidos_db` / `/api/pedidos` | Solo local (`127.0.0.1` vía Apache) |
-| **`ms-lotes`** | `servidorUbuntu2` | `127.0.0.1` | 3005 (TCP) | `lotes_db` / `/api/lotes` | Solo local (`127.0.0.1` vía Apache) |
+| `ms-usuarios` | Usuarios y Auth | Docente / Integrador de aplicación | `3001` | `usuarios_db` | Ninguno (Emisor y validador JWT) |
+| `ms-clientes` | Clientes | Juan David Ríos (`JDRios17`) | `3002` | `clientes_db` | Ninguno (Soporta consulta `?ids=`) |
+| `ms-productos` | Productos | Brandon Montilla (`Brandon1927`) | `3003` | `productos_db` | Ninguno (Soporta consulta `?ids=`) |
+| `ms-pedidos` | Pedidos | Juan Camilo Casierra (`casierra11`) | `3004` | `pedidos_db` | `ms-clientes` (3002), `ms-productos` (3003) |
+| `ms-lotes` | Lotes | Víctor Manuel Salazar (`VictorSalazar30`) | `3005` | `lotes_db` | `ms-productos` (3003) |
 
 ---
 
-## 2. Estructura del Repositorio
+## 3. Arquitectura y Topología de Red (Producción)
+
+El sistema opera sobre dos servidores virtuales Ubuntu 22.04 en red privada Host-Only, exponiendo únicamente el puerto HTTP (`80/tcp`) hacia el cliente anfitrión Windows:
+
+- **servidorUbuntu1 (`172.16.0.197`)**: Servidor DNS (`bind9`) y motor de base de datos (`MySQL`) escuchando en `127.0.0.1` y `172.16.0.197`, con el puerto `3306/tcp` restringido en `ufw` exclusivamente desde `172.16.0.198`.
+- **servidorUbuntu2 (`172.16.0.198`)**: API Gateway (`Apache2` en puerto `80`), archivos estáticos del frontend (`/var/www/app`) y los 5 microservicios ejecutándose como servicios de `systemd` bajo el usuario sin privilegios `nodeapps` (escuchando exclusivamente en `127.0.0.1`).
+
+| Componente | Servidor | Dirección IP | Puerto | Ruta / Servicio | Acceso permitido |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **DNS (bind9)** | servidorUbuntu1 | `172.16.0.197` | `53` (UDP/TCP) | Zona `agrored.com` (`app` → `.198`) | Red local (Windows y VMs) |
+| **MySQL Server** | servidorUbuntu1 | `172.16.0.197` | `3306` (TCP) | 5 esquemas independientes | Solo `servidorUbuntu2` (`172.16.0.198`) |
+| **Apache Gateway** | servidorUbuntu2 | `172.16.0.198` | `80` (TCP) | `/var/www/app` y `/api/*` | Clientes Windows (`http://app.agrored.com`) |
+| **Microservicios** | servidorUbuntu2 | `127.0.0.1` | `3001–3005` (TCP) | `ms-*.service` (`systemd`) | Solo local (`servidorUbuntu2`) |
+
+---
+
+## 4. Estructura del Repositorio
 
 ```text
 AGRORED-NOCTURNO-G2/
-├── deploy/                  # Archivos de configuración de despliegue (Apache, systemd, SQL sin contraseñas)
-│   ├── app.conf             # VirtualHost de Apache (API Gateway + DocumentRoot)
-│   ├── init_databases.sql   # Script de creación de BDs y usuarios aislados (sin contraseñas)
-│   └── *.service            # Unidades systemd para los microservicios
-├── frontend/                # Interfaz web HTML/CSS/JS conectada a rutas relativas /api
-├── ms-usuarios/             # Autenticación, emisión de tokens JWT y gestión de usuarios
-├── ms-clientes/             # Gestión de clientes (distribuidores y comercios)
-├── ms-productos/            # Catálogo de productos agroindustriales
-├── ms-pedidos/              # Gestión de pedidos (consulta ms-clientes y ms-productos)
-├── ms-lotes/                # Control de lotes de producción (consulta ms-productos)
-└── README.md                # Documentación general y guía de despliegue paso a paso
-```
----
-
-## 3. Guía de Despliegue Paso a Paso en el Ambiente.
-### A. Base de datos y DNS en servidorUbuntu1 (172.16.0.197)
-Configurar en /etc/mysql/mysql.conf.d/mysqld.cnf la escucha en 127.0.0.1 y la IP de servidorUbuntu1:
-
-```ini, TOML
-bind-address = 127.0.0.1,172.16.0.197
-```
-Reiniciar MySQL y permitir el puerto 3306/tcp únicamente desde servidorUbuntu2 (172.16.0.198):
-```bash
-sudo systemctl restart mysql
-sudo ufw allow from 172.16.0.198 to any port 3306 proto tcp
-```
-Crear las bases de datos y los usuarios restringidos a @'172.16.0.198' usando deploy/init_databases.sql (asignando las contraseñas al momento de ejecutar en el servidor, nunca en el repositorio).
-
-Agregar el registro A para app apuntando a 172.16.0.198 en la zona directa de bind9, incrementar el serial, verificar con named-checkzone y recargar bind9.
-
-### B. Microservicios (systemd) en servidorUbuntu2 (172.16.0.198)
-Instalar Node.js LTS (22.x) y git, crear el usuario del sistema nodeapps y clonar el repositorio en /srv/agrored/app:
-
-```bash
-sudo adduser --system --group --no-create-home nodeapps
-sudo mkdir -p /srv/agrored/app && sudo chown vagrant:vagrant /srv/agrored/app
-git clone https://github.com/casierra11/AGRORED-NOCTURNO-G2.git /srv/agrored/app
-```
-Desde servidorUbuntu2, cargar el schema.sql de cada microservicio a su respectiva base de datos en 172.16.0.197.
-
-En cada carpeta de microservicio (ms-usuarios, ms-clientes, ms-productos, ms-pedidos, ms-lotes):
-
-```bash
-cd /srv/agrored/app/<microservicio>
-npm ci --omit=dev
-cp .env.example .env
-nano .env
-chmod 640 .env && sudo chgrp nodeapps .env
-```
-(Asegurarse de que DB_HOST=172.16.0.197, que JWT_SECRET sea el mismo en todos los microservicios y que las URLs internas apunten a 127.0.0.1:300X).
-
-Copiar las unidades .service desde deploy/ a /etc/systemd/system/, recargar systemd y habilitar los servicios (desplegando primero ms-usuarios):
-
-```bash
-sudo cp /srv/agrored/app/deploy/ms-*.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now ms-usuarios ms-clientes ms-productos ms-pedidos ms-lotes
-Verificar que ufw en servidorUbuntu2 mantenga abiertos únicamente 22/tcp y 80/tcp (los microservicios escuchan solo en 127.0.0.1).
-```
-### C. API Gateway y Frontend en Apache (servidorUbuntu2)
-Habilitar proxy y proxy_http, copiar deploy/app.conf a /etc/apache2/sites-available/app.conf, validar sintaxis y recargar Apache:
-
-```bash
-sudo a2enmod proxy proxy_http
-sudo cp /srv/agrored/app/deploy/app.conf /etc/apache2/sites-available/app.conf
-sudo a2ensite app.conf
-sudo apache2ctl configtest
-sudo systemctl reload apache2
-```
-Copiar los archivos del frontend a /var/www/app/:
-
-```bash
-sudo mkdir -p /var/www/app
-sudo cp -r /srv/agrored/app/frontend/* /var/www/app/
-Cambiar la contraseña del usuario administrador inicial (PUT /api/usuarios/1) y crear los usuarios de prueba correspondientes a cada rol.
-```
-## Ejecución local en desarrollo (PC)
-Para probar un microservicio de forma local en desarrollo (por ejemplo, en ms-pedidos), instala dependencias con npm install, crea el archivo .env a partir de .env.example y ejecuta npm run dev.
+├── deploy/                    # Archivos de configuración de producción (sin secretos)
+│   ├── app.conf               # VirtualHost de Apache (API Gateway + DocumentRoot)
+│   ├── setup-db.sql           # Script de creación de BDs y usuarios aislados
+│   ├── ms-usuarios.service    # Unidad systemd para ms-usuarios (3001)
+│   ├── ms-clientes.service    # Unidad systemd para ms-clientes (3002)
+│   ├── ms-productos.service   # Unidad systemd para ms-productos (3003)
+│   ├── ms-pedidos.service     # Unidad systemd para ms-pedidos (3004)
+│   └── ms-lotes.service       # Unidad systemd para ms-lotes (3005)
+├── frontend/                  # Interfaz web HTML/CSS/JS conectada a rutas relativas /api
+├── ms-usuarios/               # Microservicio de autenticación, tokens JWT y gestión de usuarios
+├── ms-clientes/               # Microservicio de gestión de clientes y comercios
+├── ms-productos/              # Microservicio de catálogo de productos de la agroindustria
+├── ms-pedidos/                # Microservicio de gestión de pedidos (Node.js + Express)
+├── ms-lotes/                  # Microservicio de gestión de lotes de producción
+└── README.md                  # Documentación general del proyecto y guía de despliegue
